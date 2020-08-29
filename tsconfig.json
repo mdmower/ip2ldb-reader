@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["ES2018"],
+    "lib": ["ESNext"],
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "ES2015",
