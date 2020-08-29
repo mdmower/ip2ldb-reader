@@ -19,4 +19,4 @@ class Ip2lReader {
   }
 }
 
-export default Ip2lReader;
+export {Ip2lReader as default};
