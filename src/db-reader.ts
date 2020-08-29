@@ -1,39 +1,8 @@
 import bigInt from 'big-integer';
 import net from 'net';
 import fs, {FSWatcher} from 'fs';
-
-export interface Ip2lOptions {
-  reloadOnDbUpdate?: boolean;
-}
-
-export interface Ip2lData {
-  [key: string]: string | number | null | undefined;
-
-  ip: string | null;
-  ip_no: string | null;
-  status: string | null;
-
-  country_short?: string;
-  country_long?: string;
-  region?: string;
-  city?: string;
-  isp?: string;
-  latitude?: number;
-  longitude?: number;
-  domain?: string;
-  zipcode?: string;
-  timezone?: string;
-  netspeed?: string;
-  iddcode?: string;
-  areacode?: string;
-  weatherstationcode?: string;
-  weatherstationname?: string;
-  mcc?: string;
-  mnc?: string;
-  mobilebrand?: string;
-  elevation?: string;
-  usagetype?: string;
-}
+import {SubdivReader} from './subdiv-reader';
+import {Ip2lData, Ip2lOptions} from './interfaces';
 
 // prettier-ignore
 const Position: {
@@ -80,6 +49,7 @@ class DbReader {
   dbPath_: string | null;
   fd_: number | null;
   fsWatcher_: FSWatcher | null;
+  subdivReader_: SubdivReader | null;
   indiciesIPv4_: number[][];
   indiciesIPv6_: number[][];
   offset_: {[key: string]: number};
@@ -108,6 +78,7 @@ class DbReader {
     this.dbPath_ = null;
     this.fd_ = null;
     this.fsWatcher_ = null;
+    this.subdivReader_ = null;
 
     this.indiciesIPv4_ = [];
     this.indiciesIPv6_ = [];
@@ -286,16 +257,10 @@ class DbReader {
   }
 
   /**
-   * Load database and prepare reader
+   * Load database
    * @param dbPath IP2Location BIN database
-   * @param options Options for database reader
    */
-  init(dbPath: string, options?: Ip2lOptions): void {
-    if (!dbPath) {
-      throw new Error('Must specify path to database');
-    }
-
-    this.readerStatus_ = ReaderStatus.Initializing;
+  loadDatabase_(dbPath: string): void {
     this.dbPath_ = dbPath;
 
     if (this.fd_ !== null) {
@@ -354,12 +319,35 @@ class DbReader {
         }
       }
     }
+  }
+
+  /**
+   * Initialize reader
+   * @param dbPath IP2Location BIN database
+   * @param options Options for database reader
+   */
+  init(dbPath: string, options?: Ip2lOptions): void {
+    if (!dbPath) {
+      throw new Error('Must specify path to database');
+    }
+
+    this.readerStatus_ = ReaderStatus.Initializing;
+
+    this.loadDatabase_(dbPath);
 
     if (options && options.reloadOnDbUpdate) {
       this.watchDbFile(dbPath);
     }
 
-    this.readerStatus_ = ReaderStatus.Ready;
+    if (!options || !options.subdivisionCsvPath) {
+      this.readerStatus_ = ReaderStatus.Ready;
+      return;
+    }
+
+    this.subdivReader_ = new SubdivReader();
+    this.subdivReader_.init(options.subdivisionCsvPath, options.reloadOnDbUpdate).finally(() => {
+      this.readerStatus_ = ReaderStatus.Ready;
+    });
   }
 
   /**
@@ -508,6 +496,16 @@ class DbReader {
               data[key] = this.readString(this.readBufferInt32(this.offset_[key], buff)) || '';
             }
           });
+
+        // Subdivision support is optional
+        if (this.subdivReader_ !== null) {
+          if (typeof data.country_short === 'string' && typeof data.region === 'string') {
+            const subdivision = this.subdivReader_.get(data.country_short, data.region);
+            if (subdivision !== null) {
+              data['subdivision'] = subdivision;
+            }
+          }
+        }
 
         data.status = 'OK';
         return;

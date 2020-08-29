@@ -16,8 +16,8 @@ npm install ip2ldb-reader
 
 ```JavaScript
 import Ip2lReader from 'ip2ldb-reader';
-// Or using require syntax:
-// const Ip2lReader = require('ip2ldb-reader').default;
+// Or using require() syntax:
+// const Ip2lReader = require('ip2ldb-reader').Ip2lReader;
 
 // Define database reader options
 const options = {...};
@@ -37,12 +37,16 @@ const ipv4data = ip2lReader.get('8.8.8.8');
 {
   // {boolean} Watch filesystem for database updates and reload if detected
   reloadOnDbUpdate: false,
+
+  // {string} Path to subdivision CSV database
+  subdivisionCsvPath: undefined,
 }
 ```
 
 **Additional information**
 
 - `reloadOnDbUpdate` - When enabled, the database file is monitored for changes with a 500ms debounce. On the leading edge, the database reader is put into the `INITIALIZING` state so that attempts to read from the database short circuit and do not touch the filesystem. The updated database is reloaded on the trailing edge of the debounce. This means there is a minimum of 500ms where geolocation requests will receive `{status: "INITIALIZING"}` responses.
+- `subdivisionCsvPath` - When a filesystem path to the [IP2Location ISO 3166-2 Subdivision Code CSV database](https://www.ip2location.com/free/iso3166-2) is provided, the country code and region will be used to identify the corresponding subdivision code.
 
 ## Return
 
@@ -56,6 +60,7 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
 
   country_short?: string;
   country_long?: string;
+  subdivision?: string;
   region?: string;
   city?: string;
   isp?: string;

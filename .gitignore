@@ -105,6 +105,8 @@ dist
 
 # Custom
 lib/
+lib-testing/
 .vscode/
 database/
-*.BIN
+*.[Bb][Ii][Nn]
+*.[Cc][Ss][Vv]

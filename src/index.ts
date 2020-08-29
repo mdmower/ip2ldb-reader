@@ -1,4 +1,5 @@
-import {Ip2lData, Ip2lOptions, DbReader} from './db-reader';
+import {DbReader} from './db-reader';
+import {Ip2lOptions, Ip2lData} from './interfaces';
 
 export default class Ip2lReader {
   /**
@@ -18,3 +19,5 @@ export default class Ip2lReader {
     this.get = dbReader.get.bind(dbReader);
   }
 }
+
+export {Ip2lData, Ip2lOptions, Ip2lReader};
