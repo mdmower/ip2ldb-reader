@@ -3,7 +3,7 @@ import net from 'net';
 import fs, {FSWatcher} from 'fs';
 
 export interface Ip2lOptions {
-  reloadOnDbUpdate: boolean;
+  reloadOnDbUpdate?: boolean;
 }
 
 export interface Ip2lData {
