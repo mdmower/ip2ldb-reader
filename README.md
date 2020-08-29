@@ -1,94 +1,107 @@
-# IP2Location Node.js Module
+# ip2ldb-reader
 
-This Node.js module provides a fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code, station name, mcc, mnc, mobile brand, elevation, and usage type from IP address by using IP2Location database. This module uses a file based database available at IP2Location.com. This database simply contains IP blocks as keys, and other information such as country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code, station name, mcc, mnc, mobile brand, elevation, and usage type as values. It supports both IP address in IPv4 and IPv6.
-
-This module can be used in many types of projects such as:
-
- - select the geographically closest mirror
- - analyze your web server logs to determine the countries of your visitors
- - credit card fraud detection
- - software export controls
- - display native language and currency 
- - prevent password sharing and abuse of service 
- - geotargeting in advertisement
-
-The database will be updated in monthly basis for the greater accuracy. Free sample DB1 database is available at /samples directory or download it from https://www.ip2location.com/developers.htm.
-
-The complete database is available at https://www.ip2location.com under Premium subscription package.
-
+A database reader for IP2Location [paid](https://www.ip2location.com/database), [free](https://lite.ip2location.com/database), and [sample](https://www.ip2location.com/development-libraries) databases. This is derivative work, based on [github.com/ip2location-nodejs/IP2Location](https://github.com/ip2location-nodejs/IP2Location).
 
 ## Installation
 
-To install this module type the following:
+This module has been tested with Node.js 10, 12, and 14. Feel free to try other versions, but additional support is not promised.
 
-```bash
-
-npm install ip2location-nodejs
+Local installation
 
 ```
-
-
-## Dependencies
-
-This library requires IP2Location BIN data file to function. You may download the BIN data file at
-* IP2Location LITE BIN Data (Free): https://lite.ip2location.com
-* IP2Location Commercial BIN Data (Comprehensive): https://www.ip2location.com
-
-
-## IPv4 BIN vs IPv6 BIN
-
-Use the IPv4 BIN file if you just need to query IPv4 addresses.
-If you query an IPv6 address using the IPv4 BIN, you'll see the IPV6_NOT_SUPPORTED error.
-
-Use the IPv6 BIN file if you need to query BOTH IPv4 and IPv6 addresses.
-
-
-## Methods
-
-Below are the methods supported in this module.
-
-|Method Name|Description|
-|---|---|
-|IP2Location_init|Opens the IP2Location BIN data for lookup.|
-|IP2Location_get_all|Returns the geolocation information in an object.|
-|IP2Location_get_country_short|Returns the country code.|
-|IP2Location_get_country_long|Returns the country name.|
-|IP2Location_get_region|Returns the region name.|
-|IP2Location_get_city|Returns the city name.|
-|IP2Location_get_isp|Returns the ISP name.|
-|IP2Location_get_latitude|Returns the latitude.|
-|IP2Location_get_longitude|Returns the longitude.|
-|IP2Location_get_domain|Returns the domain name.|
-|IP2Location_get_zipcode|Returns the ZIP code.|
-|IP2Location_get_timezone|Returns the time zone.|
-|IP2Location_get_netspeed|Returns the net speed.|
-|IP2Location_get_iddcode|Returns the IDD code.|
-|IP2Location_get_areacode|Returns the area code.|
-|IP2Location_get_weatherstationcode|Returns the weather station code.|
-|IP2Location_get_weatherstationname|Returns the weather station name.|
-|IP2Location_get_mcc|Returns the mobile country code.|
-|IP2Location_get_mnc|Returns the mobile network code.|
-|IP2Location_get_mobilebrand|Returns the mobile brand.|
-|IP2Location_get_elevation|Returns the elevation in meters.|
-|IP2Location_get_usagetype|Returns the usage type.|
-
+npm install ip2ldb-reader
+```
 
 ## Usage
 
-```javascript
+```JavaScript
+const Ip2lReader = require('ip2ldb-reader');
 
-var ip2loc = require("ip2location-nodejs");
+// Define database reader options
+const options = {...};
 
-ip2loc.IP2Location_init("./DB24.BIN");
+// Construct an instance of Ip2lReader with the filesystem path
+// to an IP2Location database
+const ip2lReader = new Ip2lReader('/path/to/database.bin', options);
 
-testip = ['8.8.8.8', '2404:6800:4001:c01::67'];
+// Get geolocation data for IP addresses
+const ipv6data = ip2lReader.get('2001:4860:4860::8888');
+const ipv4data = ip2lReader.get('8.8.8.8');
+```
 
-for (var x = 0; x < testip.length; x++) {
-	result = ip2loc.IP2Location_get_all(testip[x]);
-	for (var key in result) {
-		console.log(key + ": " + result[key]);
-	}
-	console.log("--------------------------------------------------------------");
+## Options
+
+```JavaScript
+{
+  // {boolean} Watch filesystem for database updates and reload if detected
+  reloadOnDbUpdate: false,
 }
+```
+
+**Additional information**
+
+- `reloadOnDbUpdate` - When enabled, the database file is monitored for changes with a 500ms debounce. On the leading edge, the database reader is put into the `INITIALIZING` state so that attempts to read from the database short circuit and do not touch the filesystem. The updated database is reloaded on the trailing edge of the debounce. This means there is a minimum of 500ms where geolocation requests will receive `{status: "INITIALIZING"}` responses.
+
+## Return
+
+The object returned by `Ip2lReader.get(ip)` has the following structure:
+
+```JavaScript
+{
+  ip: string | null;
+  ip_no: string | null;
+  status: string | null;
+
+  country_short?: string;
+  country_long?: string;
+  region?: string;
+  city?: string;
+  isp?: string;
+  latitude?: number;
+  longitude?: number;
+  domain?: string;
+  zipcode?: string;
+  timezone?: string;
+  netspeed?: string;
+  iddcode?: string;
+  areacode?: string;
+  weatherstationcode?: string;
+  weatherstationname?: string;
+  mcc?: string;
+  mnc?: string;
+  mobilebrand?: string;
+  elevation?: string;
+  usagetype?: string;
+}
+```
+
+Properties suffixed by `?` only exist if the database supports them. For example, when using a DB1 (country only) database, a sample return object looks like
 
 ```
+{
+  ip: "8.8.8.8",
+  ip_no: "134744072",
+  status: "OK",
+  country_short: "US",
+  country_long: "United States of America"
+}
+```
+
+Possible values for `status` include:
+
+- `OK` - Successful search for geolocation data
+- `INITIALIZING` - Database reader is still initializing and is not ready to receive requests
+- `NOT_INITIALIZED` - Database reader failed to initialize
+- `IP_ADDRESS_NOT_FOUND` - IP address has correct format, but database does not contain data for it
+- `INVALID_IP_ADDRESS` - IP address does not have correct format
+- `IPV6_NOT_SUPPORTED` - Unable to lookup IPv6 address because database does not support them
+- `DATABASE_NOT_FOUND` - Database is missing from the filesystem
+
+When no geolocation data is available for a supported property in the return object:
+
+- String values are empty (`""`)
+- Number values are zero (`0`)
+
+## Known issues
+
+IP2Location databases store `latitude = 0` and `longitude = 0` when no coordinates are known for an IP. Unfortunately, this is a real location: [Null Island](https://en.wikipedia.org/wiki/Null_Island). This reader cannot determine for certain whether the coordinates are real or not known, so no attempt is made at invalidating them in the return object.
