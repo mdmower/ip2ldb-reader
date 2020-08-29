@@ -1,8 +1,8 @@
 {
   "name": "ip2ldb-reader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reader for IP2Location databases",
-  "main": "lib/index.ts",
+  "main": "lib/index.js",
   "scripts": {
     "lint": "eslint src",
     "format": "prettier --write \"src/**/*.ts\"",
