@@ -1,6 +1,6 @@
 import {Ip2lData, Ip2lOptions, DbReader} from './db-reader';
 
-class Ip2lReader {
+export default class Ip2lReader {
   /**
    * Query IP2Location database with an IP and get location information
    * @param ip IP address
@@ -18,5 +18,3 @@ class Ip2lReader {
     this.get = dbReader.get.bind(dbReader);
   }
 }
-
-export {Ip2lReader as default};
