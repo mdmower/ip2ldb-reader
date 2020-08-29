@@ -15,7 +15,9 @@ npm install ip2ldb-reader
 ## Usage
 
 ```JavaScript
-const Ip2lReader = require('ip2ldb-reader');
+import Ip2lReader from 'ip2ldb-reader';
+// Or using require syntax:
+// const Ip2lReader = require('ip2ldb-reader').default;
 
 // Define database reader options
 const options = {...};
