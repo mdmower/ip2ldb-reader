@@ -22,9 +22,11 @@ import Ip2lReader from 'ip2ldb-reader';
 // Define database reader options
 const options = {...};
 
-// Construct an instance of Ip2lReader with the filesystem path
-// to an IP2Location database
-const ip2lReader = new Ip2lReader('/path/to/database.bin', options);
+// Construct an instance of Ip2lReader
+const ip2lReader = new Ip2lReader();
+
+// Initialize reader with the IP2Location database
+await ip2lReader.init('/path/to/database.bin', options);
 
 // Get geolocation data for IP addresses
 const ipv6data = ip2lReader.get('2001:4860:4860::8888');

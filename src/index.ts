@@ -3,19 +3,22 @@ import {Ip2lOptions, Ip2lData} from './interfaces';
 
 export default class Ip2lReader {
   /**
+   * Initialize IP2Location database reader
+   * @param dbPath IP2Location BIN database
+   * @param options Options for database reader
+   */
+  init: (dbPath: string, options?: Ip2lOptions) => Promise<void>;
+
+  /**
    * Query IP2Location database with an IP and get location information
    * @param ip IP address
    */
   get: (ip: string) => Ip2lData;
 
-  /**
-   * @param binPath Path to IP2Location bin database
-   * @param options Options for database reader
-   */
-  constructor(binPath: string, options?: Ip2lOptions) {
+  constructor() {
     const dbReader = new DbReader();
-    dbReader.init(binPath, options || <Ip2lOptions>{});
 
+    this.init = dbReader.init.bind(dbReader);
     this.get = dbReader.get.bind(dbReader);
   }
 }

@@ -326,7 +326,7 @@ class DbReader {
    * @param dbPath IP2Location BIN database
    * @param options Options for database reader
    */
-  init(dbPath: string, options?: Ip2lOptions): void {
+  async init(dbPath: string, options?: Ip2lOptions): Promise<void> {
     if (!dbPath) {
       throw new Error('Must specify path to database');
     }
@@ -345,9 +345,8 @@ class DbReader {
     }
 
     this.subdivReader_ = new SubdivReader();
-    this.subdivReader_.init(options.subdivisionCsvPath, options.reloadOnDbUpdate).finally(() => {
-      this.readerStatus_ = ReaderStatus.Ready;
-    });
+    await this.subdivReader_.init(options.subdivisionCsvPath, options.reloadOnDbUpdate);
+    this.readerStatus_ = ReaderStatus.Ready;
   }
 
   /**

@@ -130,7 +130,8 @@ const loopTest = (ip2Location: Ip2lReader) => {
 
   let ip2Location: Ip2lReader;
   try {
-    ip2Location = new Ip2lReader('./database/' + databaseFilename, {
+    ip2Location = new Ip2lReader();
+    await ip2Location.init('./database/' + databaseFilename, {
       reloadOnDbUpdate: true,
       subdivisionCsvPath: subdivisionFilename ? './database/' + subdivisionFilename : undefined,
     });
