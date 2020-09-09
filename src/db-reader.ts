@@ -1,4 +1,3 @@
-import bigInt from 'big-integer';
 import net from 'net';
 import fs, {FSWatcher} from 'fs';
 import {SubdivReader} from './subdiv-reader';
@@ -30,13 +29,13 @@ const Position: {
 };
 
 const MAX_SIZE = 65536;
-const MAX_IPV4_RANGE = bigInt('4294967295');
-const MAX_IPV6_RANGE = bigInt('340282366920938463463374607431768211455');
-const FROM_6TO4 = bigInt('42545680458834377588178886921629466624');
-const TO_6TO4 = bigInt('42550872755692912415807417417958686719');
-const FROM_TEREDO = bigInt('42540488161975842760550356425300246528');
-const TO_TEREDO = bigInt('42540488241204005274814694018844196863');
-const LAST_32BITS = bigInt('4294967295');
+const MAX_IPV4_RANGE = BigInt('4294967295');
+const MAX_IPV6_RANGE = BigInt('340282366920938463463374607431768211455');
+const FROM_6TO4 = BigInt('42545680458834377588178886921629466624');
+const TO_6TO4 = BigInt('42550872755692912415807417417958686719');
+const FROM_TEREDO = BigInt('42540488161975842760550356425300246528');
+const TO_TEREDO = BigInt('42540488241204005274814694018844196863');
+const LAST_32BITS = BigInt('4294967295');
 
 enum ReaderStatus {
   NotInitialized = 0,
@@ -141,12 +140,12 @@ class DbReader {
   }
 
   /**
-   * Read 32-bit integer from the database as a BigInteger
+   * Read 32-bit integer from the database as a BigInt
    * @param pos Offset from beginning of database
    */
-  readInt32Big(pos: number): bigInt.BigInteger | undefined {
+  readInt32Big(pos: number): bigint | undefined {
     const buff = this.readToBuffer(4, pos - 1);
-    return buff ? bigInt(buff.readUInt32LE(0)) : undefined;
+    return buff ? BigInt(buff.readUInt32LE(0)) : undefined;
   }
 
   /**
@@ -159,18 +158,18 @@ class DbReader {
   }
 
   /**
-   * Read 128-bit integer from the database as a BigInteger
+   * Read 128-bit integer from the database as a BigInt
    * @param pos Offset from beginning of database
    */
-  readInt128Big(pos: number): bigInt.BigInteger | undefined {
+  readInt128Big(pos: number): bigint | undefined {
     const buff = this.readToBuffer(16, pos - 1);
     if (!buff) {
       return;
     }
 
-    let ret = bigInt(0);
+    let ret = BigInt(0);
     for (let x = 0; x < 16; x++) {
-      ret = ret.add(bigInt(buff.readUInt8(x)).shiftLeft(8 * x));
+      ret += BigInt(buff.readUInt8(x)) << BigInt(8 * x);
     }
     return ret;
   }
@@ -221,35 +220,31 @@ class DbReader {
    * Get numeric IPv6
    * @param ipv6 IPv6 address
    */
-  ipv6ToNum(ipv6: string): bigInt.BigInteger {
+  ipv6ToNum(ipv6: string): bigint {
     const maxsections = 8; // should have 8 sections
     const sectionbits = 16; // 16 bits per section
     const m = ipv6.split('::');
 
-    let total = bigInt.zero;
+    let total = BigInt(0);
 
     if (m.length === 2) {
       const arrLeft = m[0] !== '' ? m[0].split(':') : [];
       const arrRight = m[1] !== '' ? m[1].split(':') : [];
 
       for (let x = 0; x < arrLeft.length; x++) {
-        total = total.add(
-          bigInt(parseInt('0x' + arrLeft[x])).shiftLeft((maxsections - (x + 1)) * sectionbits)
-        );
+        total +=
+          BigInt(parseInt('0x' + arrLeft[x])) << BigInt((maxsections - (x + 1)) * sectionbits);
       }
 
       for (let x = 0; x < arrRight.length; x++) {
-        total = total.add(
-          bigInt(parseInt('0x' + arrRight[x])).shiftLeft((arrRight.length - (x + 1)) * sectionbits)
-        );
+        total +=
+          BigInt(parseInt('0x' + arrRight[x])) << BigInt((arrRight.length - (x + 1)) * sectionbits);
       }
     } else if (m.length === 1) {
       const arr = m[0].split(':');
 
       for (let x = 0; x < arr.length; x++) {
-        total = total.add(
-          bigInt(parseInt('0x' + arr[x])).shiftLeft((maxsections - (x + 1)) * sectionbits)
-        );
+        total += BigInt(parseInt('0x' + arr[x])) << BigInt((maxsections - (x + 1)) * sectionbits);
       }
     }
 
@@ -413,8 +408,8 @@ class DbReader {
       ipnum = this.ipv6ToNum(ip);
 
       if (
-        (ipnum.geq(FROM_6TO4) && ipnum.leq(TO_6TO4)) ||
-        (ipnum.geq(FROM_TEREDO) && ipnum.leq(TO_TEREDO))
+        (ipnum >= FROM_6TO4 && ipnum <= TO_6TO4) ||
+        (ipnum >= FROM_TEREDO && ipnum <= TO_TEREDO)
       ) {
         ipVersion = 4;
         maxIpRange = MAX_IPV4_RANGE;
@@ -422,20 +417,20 @@ class DbReader {
         baseAddr = this.dbStats_.BaseAddr;
         columnSize = this.dbStats_.ColumnSize;
 
-        if (ipnum.geq(FROM_6TO4) && ipnum.leq(TO_6TO4)) {
-          ipnum = ipnum.shiftRight(80).and(LAST_32BITS).toJSNumber();
+        if (ipnum >= FROM_6TO4 && ipnum <= TO_6TO4) {
+          ipnum = Number((ipnum >> BigInt(80)) & LAST_32BITS);
         } else {
-          ipnum = ipnum.not().and(LAST_32BITS).toJSNumber();
+          ipnum = Number(-ipnum & LAST_32BITS);
         }
         if (this.dbStats_.Indexed) {
           const indexaddr = ipnum >>> 16;
           low = this.indiciesIPv4_[indexaddr][0];
           high = this.indiciesIPv4_[indexaddr][1];
         }
-        ipnum = bigInt(ipnum);
+        ipnum = BigInt(ipnum);
       } else {
         if (this.dbStats_.IndexedIPv6) {
-          const indexaddr = ipnum.shiftRight(112).toJSNumber();
+          const indexaddr = Number(ipnum >> BigInt(112));
           low = this.indiciesIPv6_[indexaddr][0];
           high = this.indiciesIPv6_[indexaddr][1];
         }
@@ -452,13 +447,13 @@ class DbReader {
         low = this.indiciesIPv4_[indexaddr][0];
         high = this.indiciesIPv4_[indexaddr][1];
       }
-      ipnum = bigInt(ipnum);
+      ipnum = BigInt(ipnum);
     }
 
     data.ip = ip;
 
-    if (ipnum.geq(maxIpRange)) {
-      ipnum = maxIpRange.minus(1);
+    if (ipnum >= maxIpRange) {
+      ipnum = maxIpRange - BigInt(1);
     }
 
     data.ip_no = ipnum.toString();
@@ -474,7 +469,7 @@ class DbReader {
         break;
       }
 
-      if (ipfrom.leq(ipnum) && ipto.gt(ipnum)) {
+      if (ipfrom <= ipnum && ipto > ipnum) {
         const firstcol = ipVersion === 6 ? 16 : 4;
         const buff = this.readToBuffer(columnSize - firstcol, rowoffset + firstcol - 1);
         if (!buff) {
@@ -509,7 +504,7 @@ class DbReader {
         data.status = 'OK';
         return;
       } else {
-        if (ipfrom.gt(ipnum)) {
+        if (ipfrom > ipnum) {
           high = mid - 1;
         } else {
           low = mid + 1;

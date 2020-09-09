@@ -29,9 +29,7 @@
     "url": "https://github.com/mdmower/ip2ldb-reader/issues"
   },
   "homepage": "https://github.com/mdmower/ip2ldb-reader#readme",
-  "dependencies": {
-    "big-integer": "^1.6.44"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^14.6.2",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
