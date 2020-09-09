@@ -10,7 +10,7 @@
     "compile": "tsc",
     "compile-testing": "tsc --build tsconfig-testing.json",
     "prepublishOnly": "npm run build",
-    "cliTest": "node lib/cli-test.js"
+    "cliTest": "node lib-testing/cli-testing.js"
   },
   "files": [
     "lib/**/*"
