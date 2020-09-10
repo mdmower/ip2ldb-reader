@@ -7,13 +7,13 @@ export default class Ip2lReader {
    * @param dbPath IP2Location BIN database
    * @param options Options for database reader
    */
-  init: (dbPath: string, options?: Ip2lOptions) => Promise<void>;
+  public init: (dbPath: string, options?: Ip2lOptions) => Promise<void>;
 
   /**
    * Query IP2Location database with an IP and get location information
    * @param ip IP address
    */
-  get: (ip: string) => Ip2lData;
+  public get: (ip: string) => Ip2lData;
 
   constructor() {
     const dbReader = new DbReader();

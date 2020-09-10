@@ -44,16 +44,16 @@ enum ReaderStatus {
 }
 
 class DbReader {
-  readerStatus_: ReaderStatus;
-  dbPath_: string | null;
-  fd_: number | null;
-  fsWatcher_: FSWatcher | null;
-  subdivReader_: SubdivReader | null;
-  indiciesIPv4_: number[][];
-  indiciesIPv6_: number[][];
-  offset_: {[key: string]: number};
-  enabled_: {[key: string]: boolean};
-  dbStats_: {
+  private readerStatus_: ReaderStatus;
+  private dbPath_: string | null;
+  private fd_: number | null;
+  private fsWatcher_: FSWatcher | null;
+  private subdivReader_: SubdivReader | null;
+  private indiciesIPv4_: number[][];
+  private indiciesIPv6_: number[][];
+  private offset_: {[key: string]: number};
+  private enabled_: {[key: string]: boolean};
+  private dbStats_: {
     DBType: number;
     DBColumn: number;
     DBYear: number;
@@ -111,7 +111,7 @@ class DbReader {
    * @param readbytes Number of bytes to read
    * @param pos Offset from beginning of database
    */
-  readToBuffer(readbytes: number, pos: number): Buffer | undefined {
+  private readToBuffer(readbytes: number, pos: number): Buffer | undefined {
     if (!this.fd_) {
       throw new Error('Missing file descriptor, cannot read data');
     }
@@ -125,7 +125,7 @@ class DbReader {
    * Read 8-bit integer from the database
    * @param pos Offset from beginning of database
    */
-  readInt8(pos: number): number | undefined {
+  private readInt8(pos: number): number | undefined {
     const buff = this.readToBuffer(1, pos - 1);
     return buff ? buff.readUInt8(0) : undefined;
   }
@@ -134,7 +134,7 @@ class DbReader {
    * Read 32-bit integer from the database
    * @param pos Offset from beginning of database
    */
-  readInt32(pos: number): number | undefined {
+  private readInt32(pos: number): number | undefined {
     const buff = this.readToBuffer(4, pos - 1);
     return buff ? buff.readUInt32LE(0) : undefined;
   }
@@ -143,7 +143,7 @@ class DbReader {
    * Read 32-bit integer from the database as a BigInt
    * @param pos Offset from beginning of database
    */
-  readInt32Big(pos: number): bigint | undefined {
+  private readInt32Big(pos: number): bigint | undefined {
     const buff = this.readToBuffer(4, pos - 1);
     return buff ? BigInt(buff.readUInt32LE(0)) : undefined;
   }
@@ -152,7 +152,7 @@ class DbReader {
    * Read 32-bit float from the database
    * @param pos Offset from beginning of database
    */
-  readFloat(pos: number): number | undefined {
+  private readFloat(pos: number): number | undefined {
     const buff = this.readToBuffer(4, pos - 1);
     return buff ? buff.readFloatLE(0) : undefined;
   }
@@ -161,7 +161,7 @@ class DbReader {
    * Read 128-bit integer from the database as a BigInt
    * @param pos Offset from beginning of database
    */
-  readInt128Big(pos: number): bigint | undefined {
+  private readInt128Big(pos: number): bigint | undefined {
     const buff = this.readToBuffer(16, pos - 1);
     if (!buff) {
       return;
@@ -178,7 +178,7 @@ class DbReader {
    * Read string from the database
    * @param pos Offset from beginning of database
    */
-  readString(pos: number): string | undefined {
+  private readString(pos: number): string | undefined {
     const strBytes = this.readInt8(pos + 1);
     if (!strBytes) {
       return;
@@ -194,7 +194,7 @@ class DbReader {
    * @param pos Offset from beginning of buffer
    * @param buff Buffer
    */
-  readBufferInt32(pos: number, buff: Buffer): number {
+  private readBufferInt32(pos: number, buff: Buffer): number {
     return buff.readUInt32LE(pos);
   }
 
@@ -203,7 +203,7 @@ class DbReader {
    * @param pos Offset from beginning of buffer
    * @param buff Buffer
    */
-  readBufferFloat(pos: number, buff: Buffer): number {
+  private readBufferFloat(pos: number, buff: Buffer): number {
     return buff.readFloatLE(pos);
   }
 
@@ -211,7 +211,7 @@ class DbReader {
    * Get numeric IPv4
    * @param ipv4 IPv4 address
    */
-  ipv4ToNum(ipv4: string): number {
+  private ipv4ToNum(ipv4: string): number {
     const d = ipv4.split('.');
     return ((+d[0] * 256 + +d[1]) * 256 + +d[2]) * 256 + +d[3];
   }
@@ -220,7 +220,7 @@ class DbReader {
    * Get numeric IPv6
    * @param ipv6 IPv6 address
    */
-  ipv6ToNum(ipv6: string): bigint {
+  private ipv6ToNum(ipv6: string): bigint {
     const maxsections = 8; // should have 8 sections
     const sectionbits = 16; // 16 bits per section
     const m = ipv6.split('::');
@@ -255,7 +255,7 @@ class DbReader {
    * Load database
    * @param dbPath IP2Location BIN database
    */
-  loadDatabase_(dbPath: string): void {
+  private loadDatabase(dbPath: string): void {
     this.dbPath_ = dbPath;
 
     if (this.fd_ !== null) {
@@ -317,18 +317,18 @@ class DbReader {
   }
 
   /**
-   * Initialize reader
+   * Initialize IP2Location database reader
    * @param dbPath IP2Location BIN database
    * @param options Options for database reader
    */
-  async init(dbPath: string, options?: Ip2lOptions): Promise<void> {
+  public async init(dbPath: string, options?: Ip2lOptions): Promise<void> {
     if (!dbPath) {
       throw new Error('Must specify path to database');
     }
 
     this.readerStatus_ = ReaderStatus.Initializing;
 
-    this.loadDatabase_(dbPath);
+    this.loadDatabase(dbPath);
 
     if (options && options.reloadOnDbUpdate) {
       this.watchDbFile(dbPath);
@@ -348,7 +348,7 @@ class DbReader {
    * Watch database file for changes and re-init if a change is detected
    * @param dbPath Path to watch
    */
-  watchDbFile(dbPath: string): void {
+  private watchDbFile(dbPath: string): void {
     let timeout: NodeJS.Timeout | null = null;
     let originalState: ReaderStatus = this.readerStatus_;
 
@@ -392,7 +392,7 @@ class DbReader {
    * @param ipVersion IP version
    * @param data Output data object
    */
-  query(ip: string, ipVersion: number, data: Ip2lData): void {
+  private query(ip: string, ipVersion: number, data: Ip2lData): void {
     let low: number = 0;
     let high: number;
     let maxIpRange: bigint;
@@ -515,10 +515,10 @@ class DbReader {
   }
 
   /**
-   * Get data about IP address from database
+   * Query IP2Location database with an IP and get location information
    * @param ip IP address
    */
-  get(ip: string): Ip2lData {
+  public get(ip: string): Ip2lData {
     const data: Ip2lData = {
       ip: '',
       ip_no: '',

@@ -6,10 +6,10 @@
     "target": "ES2015",
     "strict": true,
     "esModuleInterop": true,
-    "outDir": "lib-testing",
+    "outDir": "lib",
     "sourceMap": true,
     "declaration": true
   },
-  "include": ["src-testing/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.testing.ts"]
 }

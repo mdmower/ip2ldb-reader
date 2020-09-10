@@ -12,10 +12,10 @@ enum ReaderStatus {
 }
 
 class SubdivReader {
-  readerStatus_: ReaderStatus;
-  dbPath_: string | null;
-  fsWatcher_: FSWatcher | null;
-  subdivisionMap_: SubdivisionMap | null;
+  private readerStatus_: ReaderStatus;
+  private dbPath_: string | null;
+  private fsWatcher_: FSWatcher | null;
+  private subdivisionMap_: SubdivisionMap | null;
 
   constructor() {
     this.readerStatus_ = ReaderStatus.NotInitialized;
@@ -27,9 +27,8 @@ class SubdivReader {
   /**
    * Load IP2Location subdivision map into memory
    * @param csvPath Filesystem path to IP2Location CSV subdivision database
-   * @private
    */
-  async loadSubdivisionMap(csvPath: string): Promise<void> {
+  private async loadSubdivisionMap(csvPath: string): Promise<void> {
     const expectedHeader = '"country_code","subdivision_name","code"';
     const expectedLineRe = /^"(\w{2})","([^"]+)","([^"]+)"$/;
     let subdivisionMap: SubdivisionMap | null = {};
@@ -49,7 +48,7 @@ class SubdivReader {
         }
         firstLine = false;
       } else if (subdivisionMap !== null) {
-        const match = line.match(expectedLineRe);
+        const match = expectedLineRe.exec(line);
         if (match && match[3] !== '-') {
           const country = match[1];
           const region = match[2];
@@ -77,7 +76,7 @@ class SubdivReader {
    * @param dbPath IP2Location BIN database
    * @param reloadOnDbUpdate Options for database reader
    */
-  async init(dbPath: string, reloadOnDbUpdate?: boolean): Promise<void> {
+  public async init(dbPath: string, reloadOnDbUpdate?: boolean): Promise<void> {
     if (!dbPath) {
       throw new Error('Must specify path to subdivision CSV database');
     }
@@ -85,10 +84,10 @@ class SubdivReader {
     this.readerStatus_ = ReaderStatus.Initializing;
     this.dbPath_ = dbPath;
 
-    await this.loadSubdivisionMap(dbPath);
+    await this.loadSubdivisionMap(this.dbPath_);
 
     if (reloadOnDbUpdate) {
-      this.watchDbFile(dbPath);
+      this.watchDbFile(this.dbPath_);
     }
 
     this.readerStatus_ = ReaderStatus.Ready;
@@ -98,7 +97,7 @@ class SubdivReader {
    * Watch database file for changes and re-init if a change is detected
    * @param dbPath Path to watch
    */
-  watchDbFile(dbPath: string): void {
+  private watchDbFile(dbPath: string): void {
     let timeout: NodeJS.Timeout | null = null;
 
     const dbChangeHandler = (filename: string) => {
@@ -107,7 +106,7 @@ class SubdivReader {
           this.fsWatcher_.close();
           this.fsWatcher_ = null;
         }
-        this.init(dbPath, true);
+        this.init(dbPath, true).catch(() => undefined);
       }
     };
 
@@ -130,7 +129,7 @@ class SubdivReader {
    * @param country ISO 3166-1 country code from IP2Location database
    * @param region Region from from IP2Location database
    */
-  get(country: string, region: string): string | null {
+  public get(country: string, region: string): string | null {
     if (this.readerStatus_ !== ReaderStatus.Ready || !this.subdivisionMap_) {
       return null;
     }

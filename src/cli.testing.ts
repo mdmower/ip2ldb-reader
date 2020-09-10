@@ -1,4 +1,4 @@
-import Ip2lReader from '../lib/index';
+import Ip2lReader from './index';
 import fs from 'fs';
 import readline from 'readline';
 
@@ -62,16 +62,19 @@ const loopTest = (ip2Location: Ip2lReader) => {
     try {
       const ip2lData = ip2Location.get('2A04:6800:4001:c01::93');
       if (ip2lData.status !== 'OK') {
-        console.log(`Status: ${ip2lData.status}`);
+        console.log(`Status: ${ip2lData.status || 'null'}`);
       } else {
         if ((iteration - 1) % 40 === 0) {
+          const country_short = ip2lData.country_short || '';
+          const region = ip2lData.region || '';
+          const subdivision = ip2lData.subdivision || '';
           console.log(
-            `Iteration: ${iteration}, Status: ${ip2lData.status}\n  Country: ${ip2lData.country_short}, Region: ${ip2lData.region}, Subdivision: ${ip2lData.subdivision}`
+            `Iteration: ${iteration}, Status: ${ip2lData.status}\n  Country: ${country_short}, Region: ${region}, Subdivision: ${subdivision}`
           );
         }
       }
     } catch (ex) {
-      console.error(ex.message);
+      console.error(ex instanceof Error ? ex.message : ex);
     }
   }, 50);
 };
@@ -148,7 +151,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
     '2': 'Loop test',
   };
   const operationsList = Object.keys(supportedOperations).map(
-    (key) => `  ${key}: ${supportedOperations[key]}`
+    (key) => `  ${key}: ${supportedOperations[key] || ''}`
   );
   console.log('Operations:\n' + operationsList.join('\n') + '\n');
 
@@ -172,4 +175,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
       break;
     }
   }
-})();
+})().catch((error) => {
+  console.error(`Unexpected error in main program\n`, error);
+  process.exit(1);
+});

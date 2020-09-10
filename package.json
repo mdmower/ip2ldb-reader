@@ -1,16 +1,18 @@
 {
   "name": "ip2ldb-reader",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Reader for IP2Location databases",
   "main": "lib/index.js",
   "scripts": {
     "lint": "eslint src",
     "format": "prettier --write \"src/**/*.ts\"",
+    "clean": "node build/clean.js",
+    "compile": "tsc --build tsconfig.json",
+    "compile-release": "tsc --build tsconfig.release.json",
     "build": "npm run lint && npm run compile",
-    "compile": "tsc",
-    "compile-testing": "tsc --build tsconfig-testing.json",
-    "prepublishOnly": "npm run build",
-    "cliTest": "node lib-testing/cli-testing.js"
+    "build-release": "npm run lint && npm run compile-release",
+    "prepublishOnly": "npm run clean && npm run build-release",
+    "cli-testing": "node lib/cli.testing.js"
   },
   "files": [
     "lib/**/*"
@@ -38,6 +40,7 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-jsdoc": "^30.4.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "fs-extra": "^9.0.1",
     "prettier": "^2.1.1",
     "typescript": "^4.0.2"
   }
