@@ -296,8 +296,8 @@ class DbReader {
       this.enabled_[key] = Boolean(Position[key][dbType]);
     });
 
-    this.indiciesIPv4_ = new Array(MAX_SIZE);
-    this.indiciesIPv6_ = new Array(MAX_SIZE);
+    this.indiciesIPv4_ = new Array<number[]>(MAX_SIZE);
+    this.indiciesIPv6_ = new Array<number[]>(MAX_SIZE);
 
     if (this.dbStats_.Indexed) {
       let pointer = this.dbStats_.IndexBaseAddr;
@@ -352,13 +352,13 @@ class DbReader {
     let timeout: NodeJS.Timeout | null = null;
     let originalState: ReaderStatus = this.readerStatus_;
 
-    const dbChangeHandler = (filename: string) => {
+    const dbChangeHandler = async (filename: string) => {
       if (filename && fs.existsSync(dbPath)) {
         if (this.fsWatcher_ !== null) {
           this.fsWatcher_.close();
           this.fsWatcher_ = null;
         }
-        this.init(dbPath, <Ip2lOptions>{reloadOnDbUpdate: true});
+        await this.init(dbPath, <Ip2lOptions>{reloadOnDbUpdate: true});
       } else {
         // TODO: This isn't terrific, since the reader status will be
         // marked as 'Ready' if a database suddenly disappears. It
@@ -381,7 +381,7 @@ class DbReader {
       }
       timeout = setTimeout(() => {
         timeout = null;
-        dbChangeHandler(filename);
+        dbChangeHandler(filename).catch(() => undefined);
       }, 500);
     });
   }
