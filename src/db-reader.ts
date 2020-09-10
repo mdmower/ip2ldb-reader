@@ -420,7 +420,7 @@ class DbReader {
         if (ipnum >= FROM_6TO4 && ipnum <= TO_6TO4) {
           ipnum = Number((ipnum >> BigInt(80)) & LAST_32BITS);
         } else {
-          ipnum = Number(-ipnum & LAST_32BITS);
+          ipnum = Number(~ipnum & LAST_32BITS);
         }
         if (this.dbStats_.Indexed) {
           const indexaddr = ipnum >>> 16;
