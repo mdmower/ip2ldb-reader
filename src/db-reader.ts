@@ -393,12 +393,12 @@ class DbReader {
    * @param data Output data object
    */
   query(ip: string, ipVersion: number, data: Ip2lData): void {
-    let low = 0;
-    let high;
-    let maxIpRange;
-    let baseAddr;
-    let columnSize;
-    let ipnum;
+    let low: number = 0;
+    let high: number;
+    let maxIpRange: bigint;
+    let baseAddr: number;
+    let columnSize: number;
+    let ipnum: bigint;
 
     if (ipVersion === 6) {
       maxIpRange = MAX_IPV6_RANGE;
@@ -418,12 +418,12 @@ class DbReader {
         columnSize = this.dbStats_.ColumnSize;
 
         if (ipnum >= FROM_6TO4 && ipnum <= TO_6TO4) {
-          ipnum = Number((ipnum >> BigInt(80)) & LAST_32BITS);
+          ipnum = (ipnum >> BigInt(80)) & LAST_32BITS;
         } else {
-          ipnum = Number(~ipnum & LAST_32BITS);
+          ipnum = ~ipnum & LAST_32BITS;
         }
         if (this.dbStats_.Indexed) {
-          const indexaddr = ipnum >>> 16;
+          const indexaddr = Number(ipnum) >>> 16;
           low = this.indiciesIPv4_[indexaddr][0];
           high = this.indiciesIPv4_[indexaddr][1];
         }
@@ -440,14 +440,13 @@ class DbReader {
       high = this.dbStats_.DBCount;
       baseAddr = this.dbStats_.BaseAddr;
       columnSize = this.dbStats_.ColumnSize;
-      ipnum = this.ipv4ToNum(ip);
+      ipnum = BigInt(this.ipv4ToNum(ip));
 
       if (this.dbStats_.Indexed) {
-        const indexaddr = ipnum >>> 16;
+        const indexaddr = Number(ipnum) >>> 16;
         low = this.indiciesIPv4_[indexaddr][0];
         high = this.indiciesIPv4_[indexaddr][1];
       }
-      ipnum = BigInt(ipnum);
     }
 
     data.ip = ip;
