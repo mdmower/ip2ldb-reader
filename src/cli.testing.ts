@@ -93,11 +93,11 @@ const loopTest = (ip2Location: Ip2lReader) => {
     return exitWithInstructions();
   }
 
-  const subdivisionFiles = databaseDirContents.filter((x) => x.isFile() && /\.csv$/i.test(x.name));
-  const subdivisionSelection = subdivisionFiles.map((f, i) => `  ${i + 1}: ${f.name}`);
+  const csvFiles = databaseDirContents.filter((x) => x.isFile() && /\.csv$/i.test(x.name));
+  const csvSelection = csvFiles.map((f, i) => `  ${i + 1}: ${f.name}`);
 
   console.log('Type CTRL+C at any time to exit...\n');
-  console.log('Available databases:\n' + databaseSelection.join('\n') + '\n');
+  console.log('Available BIN databases:\n' + databaseSelection.join('\n') + '\n');
   const selectedDatabase = await new Promise<string>((resolve) => {
     rl.question('Select a database by number: ', resolve);
   });
@@ -112,24 +112,39 @@ const loopTest = (ip2Location: Ip2lReader) => {
   }
 
   let subdivisionFilename: string | undefined;
-  if (subdivisionSelection.length) {
-    console.log('\nAvailable subdivision databases:\n' + subdivisionSelection.join('\n') + '\n');
+  let geoNameIdFilename: string | undefined;
+  if (csvSelection.length) {
+    console.log('\nAvailable CSV databases:\n' + csvSelection.join('\n') + '\n');
     const selectedSubdivision = await new Promise<string>((resolve) => {
       rl.question('Select a subdivision database by number (optional): ', resolve);
     });
 
     if (/^\d+$/.test(selectedSubdivision)) {
-      subdivisionFilename = subdivisionFiles[parseInt(selectedSubdivision) - 1]?.name;
-    } else {
+      subdivisionFilename = csvFiles[parseInt(selectedSubdivision) - 1]?.name;
+    } else if (selectedSubdivision) {
       console.log('Invalid subdivision selection');
+    }
+
+    const selectedGeoNameId = await new Promise<string>((resolve) => {
+      rl.question('Select a GeoName ID database by number (optional): ', resolve);
+    });
+
+    if (/^\d+$/.test(selectedGeoNameId)) {
+      geoNameIdFilename = csvFiles[parseInt(selectedGeoNameId) - 1]?.name;
+    } else if (selectedGeoNameId) {
+      console.log('Invalid GeoName ID selection');
     }
   }
 
-  process.stdout.write(`\nLoading database '${databaseFilename}'`);
+  console.log('\nLoading database(s):');
+  console.log(`  ${databaseFilename}`);
   if (subdivisionFilename) {
-    process.stdout.write(' with subdivision support');
+    console.log(`  ${subdivisionFilename}`);
   }
-  process.stdout.write('... ');
+  if (geoNameIdFilename) {
+    console.log(`  ${geoNameIdFilename}`);
+  }
+  process.stdout.write('  ... ');
 
   let ip2Location: Ip2lReader;
   try {
@@ -137,6 +152,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
     await ip2Location.init('./database/' + databaseFilename, {
       reloadOnDbUpdate: true,
       subdivisionCsvPath: subdivisionFilename ? './database/' + subdivisionFilename : undefined,
+      geoNameIdCsvPath: geoNameIdFilename ? './database/' + geoNameIdFilename : undefined,
     });
   } catch (ex) {
     return exitWithError(

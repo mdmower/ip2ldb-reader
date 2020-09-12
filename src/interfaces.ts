@@ -8,6 +8,11 @@ export interface Ip2lOptions {
    * Path to IP2Location subdivision CSV database (default: undefined)
    */
   subdivisionCsvPath?: string;
+
+  /**
+   * Path to IP2Location GeoNameID CSV database (default: undefined)
+   */
+  geoNameIdCsvPath?: string;
 }
 
 export interface Ip2lData {
@@ -132,4 +137,9 @@ export interface Ip2lData {
    * Usage type classification of ISP or company
    */
   usagetype?: string;
+
+  /**
+   * GeoName ID
+   */
+  geoname_id?: number;
 }
