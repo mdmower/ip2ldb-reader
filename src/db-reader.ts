@@ -1,6 +1,5 @@
 import net from 'net';
 import fs, {FSWatcher} from 'fs';
-import {SubdivReader} from './subdiv-reader';
 import {Ip2lData, Ip2lOptions} from './interfaces';
 
 // prettier-ignore
@@ -48,7 +47,6 @@ class DbReader {
   private dbPath_: string | null;
   private fd_: number | null;
   private fsWatcher_: FSWatcher | null;
-  private subdivReader_: SubdivReader | null;
   private indiciesIPv4_: number[][];
   private indiciesIPv6_: number[][];
   private offset_: {[key: string]: number};
@@ -77,7 +75,6 @@ class DbReader {
     this.dbPath_ = null;
     this.fd_ = null;
     this.fsWatcher_ = null;
-    this.subdivReader_ = null;
 
     this.indiciesIPv4_ = [];
     this.indiciesIPv6_ = [];
@@ -321,7 +318,7 @@ class DbReader {
    * @param dbPath IP2Location BIN database
    * @param options Options for database reader
    */
-  public async init(dbPath: string, options?: Ip2lOptions): Promise<void> {
+  public init(dbPath: string, options?: Ip2lOptions): void {
     if (!dbPath) {
       throw new Error('Must specify path to database');
     }
@@ -334,13 +331,6 @@ class DbReader {
       this.watchDbFile(dbPath);
     }
 
-    if (!options || !options.subdivisionCsvPath) {
-      this.readerStatus_ = ReaderStatus.Ready;
-      return;
-    }
-
-    this.subdivReader_ = new SubdivReader();
-    await this.subdivReader_.init(options.subdivisionCsvPath, options.reloadOnDbUpdate);
     this.readerStatus_ = ReaderStatus.Ready;
   }
 
@@ -352,13 +342,13 @@ class DbReader {
     let timeout: NodeJS.Timeout | null = null;
     let originalState: ReaderStatus = this.readerStatus_;
 
-    const dbChangeHandler = async (filename: string) => {
+    const dbChangeHandler = (filename: string) => {
       if (filename && fs.existsSync(dbPath)) {
         if (this.fsWatcher_ !== null) {
           this.fsWatcher_.close();
           this.fsWatcher_ = null;
         }
-        await this.init(dbPath, <Ip2lOptions>{reloadOnDbUpdate: true});
+        this.init(dbPath, <Ip2lOptions>{reloadOnDbUpdate: true});
       } else {
         // TODO: This isn't terrific, since the reader status will be
         // marked as 'Ready' if a database suddenly disappears. It
@@ -381,7 +371,7 @@ class DbReader {
       }
       timeout = setTimeout(() => {
         timeout = null;
-        dbChangeHandler(filename).catch(() => undefined);
+        dbChangeHandler(filename);
       }, 500);
     });
   }
@@ -489,16 +479,6 @@ class DbReader {
               data[key] = this.readString(this.readBufferInt32(this.offset_[key], buff)) || '';
             }
           });
-
-        // Subdivision support is optional
-        if (this.subdivReader_ !== null) {
-          if (typeof data.country_short === 'string' && typeof data.region === 'string') {
-            const subdivision = this.subdivReader_.get(data.country_short, data.region);
-            if (subdivision !== null) {
-              data['subdivision'] = subdivision;
-            }
-          }
-        }
 
         data.status = 'OK';
         return;
