@@ -29,11 +29,12 @@ const exitWithInstructions = () => {
 
 const queryByIp = (ip2Location: Ip2lReader) => {
   const sampleIps = [
-    '  192.168.0.1',
     '  8.8.8.8',
-    '  ::FFFF:8.8.8.8',
-    '  2A04:0000:0000:0000:0000:0000:0000:0000',
-    '  2A04:6800:4001:c01::93',
+    '  2001:4860:4860::8888',
+    '  ::FFFF:8.8.8.8 (Mapped)',
+    '  2001:0000:4136:E378:8000:63BF:F7F7:F7F7 --> 8.8.8.8 (Toredo)',
+    '  2002:808:808:: (6to4)',
+    '  2A04:6800:4001:c01::93 (Sample DB)',
   ];
 
   console.log('Sample IPs:\n' + sampleIps.join('\n') + '\n');

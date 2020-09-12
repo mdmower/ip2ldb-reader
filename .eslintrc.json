@@ -20,6 +20,12 @@
     "prettier/prettier": ["error"],
     "no-undef": "error",
     "no-var": "error",
+    "prefer-const": [
+      "error",
+      {
+        "destructuring": "all"
+      }
+    ],
     "@typescript-eslint/no-inferrable-types": "off",
     "jsdoc/require-jsdoc": [
       "error",

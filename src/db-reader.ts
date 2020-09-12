@@ -1,4 +1,4 @@
-import net from 'net';
+import {parseIp} from './ip-utils';
 import fs, {FSWatcher} from 'fs';
 import {Ip2lData, Ip2lOptions} from './interfaces';
 
@@ -30,11 +30,6 @@ const Position: {
 const MAX_SIZE = 65536;
 const MAX_IPV4_RANGE = BigInt('4294967295');
 const MAX_IPV6_RANGE = BigInt('340282366920938463463374607431768211455');
-const FROM_6TO4 = BigInt('42545680458834377588178886921629466624');
-const TO_6TO4 = BigInt('42550872755692912415807417417958686719');
-const FROM_TEREDO = BigInt('42540488161975842760550356425300246528');
-const TO_TEREDO = BigInt('42540488241204005274814694018844196863');
-const LAST_32BITS = BigInt('4294967295');
 
 enum ReaderStatus {
   NotInitialized = 0,
@@ -205,50 +200,6 @@ class DbReader {
   }
 
   /**
-   * Get numeric IPv4
-   * @param ipv4 IPv4 address
-   */
-  private ipv4ToNum(ipv4: string): number {
-    const d = ipv4.split('.');
-    return ((+d[0] * 256 + +d[1]) * 256 + +d[2]) * 256 + +d[3];
-  }
-
-  /**
-   * Get numeric IPv6
-   * @param ipv6 IPv6 address
-   */
-  private ipv6ToNum(ipv6: string): bigint {
-    const maxsections = 8; // should have 8 sections
-    const sectionbits = 16; // 16 bits per section
-    const m = ipv6.split('::');
-
-    let total = BigInt(0);
-
-    if (m.length === 2) {
-      const arrLeft = m[0] !== '' ? m[0].split(':') : [];
-      const arrRight = m[1] !== '' ? m[1].split(':') : [];
-
-      for (let x = 0; x < arrLeft.length; x++) {
-        total +=
-          BigInt(parseInt('0x' + arrLeft[x])) << BigInt((maxsections - (x + 1)) * sectionbits);
-      }
-
-      for (let x = 0; x < arrRight.length; x++) {
-        total +=
-          BigInt(parseInt('0x' + arrRight[x])) << BigInt((arrRight.length - (x + 1)) * sectionbits);
-      }
-    } else if (m.length === 1) {
-      const arr = m[0].split(':');
-
-      for (let x = 0; x < arr.length; x++) {
-        total += BigInt(parseInt('0x' + arr[x])) << BigInt((maxsections - (x + 1)) * sectionbits);
-      }
-    }
-
-    return total;
-  }
-
-  /**
    * Load database
    * @param dbPath IP2Location BIN database
    */
@@ -378,74 +329,44 @@ class DbReader {
 
   /**
    * Populate data object with database query results for an IP address
-   * @param ip IP address
+   * @param ipNum IP number
    * @param ipVersion IP version
    * @param data Output data object
    */
-  private query(ip: string, ipVersion: number, data: Ip2lData): void {
+  private query(ipNum: bigint, ipVersion: number, data: Ip2lData): void {
     let low: number = 0;
     let high: number;
     let maxIpRange: bigint;
     let baseAddr: number;
     let columnSize: number;
-    let ipnum: bigint;
 
     if (ipVersion === 6) {
       maxIpRange = MAX_IPV6_RANGE;
       high = this.dbStats_.DBCountIPv6;
       baseAddr = this.dbStats_.BaseAddrIPv6;
       columnSize = this.dbStats_.ColumnSizeIPv6;
-      ipnum = this.ipv6ToNum(ip);
 
-      if (
-        (ipnum >= FROM_6TO4 && ipnum <= TO_6TO4) ||
-        (ipnum >= FROM_TEREDO && ipnum <= TO_TEREDO)
-      ) {
-        ipVersion = 4;
-        maxIpRange = MAX_IPV4_RANGE;
-        high = this.dbStats_.DBCount;
-        baseAddr = this.dbStats_.BaseAddr;
-        columnSize = this.dbStats_.ColumnSize;
-
-        if (ipnum >= FROM_6TO4 && ipnum <= TO_6TO4) {
-          ipnum = (ipnum >> BigInt(80)) & LAST_32BITS;
-        } else {
-          ipnum = ~ipnum & LAST_32BITS;
-        }
-        if (this.dbStats_.Indexed) {
-          const indexaddr = Number(ipnum) >>> 16;
-          low = this.indiciesIPv4_[indexaddr][0];
-          high = this.indiciesIPv4_[indexaddr][1];
-        }
-        ipnum = BigInt(ipnum);
-      } else {
-        if (this.dbStats_.IndexedIPv6) {
-          const indexaddr = Number(ipnum >> BigInt(112));
-          low = this.indiciesIPv6_[indexaddr][0];
-          high = this.indiciesIPv6_[indexaddr][1];
-        }
+      if (this.dbStats_.IndexedIPv6) {
+        const indexaddr = Number(ipNum >> BigInt(112));
+        low = this.indiciesIPv6_[indexaddr][0];
+        high = this.indiciesIPv6_[indexaddr][1];
       }
     } else {
       maxIpRange = MAX_IPV4_RANGE;
       high = this.dbStats_.DBCount;
       baseAddr = this.dbStats_.BaseAddr;
       columnSize = this.dbStats_.ColumnSize;
-      ipnum = BigInt(this.ipv4ToNum(ip));
 
       if (this.dbStats_.Indexed) {
-        const indexaddr = Number(ipnum) >>> 16;
+        const indexaddr = Number(ipNum) >>> 16;
         low = this.indiciesIPv4_[indexaddr][0];
         high = this.indiciesIPv4_[indexaddr][1];
       }
     }
 
-    data.ip = ip;
-
-    if (ipnum >= maxIpRange) {
-      ipnum = maxIpRange - BigInt(1);
+    if (ipNum >= maxIpRange) {
+      ipNum = maxIpRange - BigInt(1);
     }
-
-    data.ip_no = ipnum.toString();
 
     while (low <= high) {
       const mid = Math.floor((low + high) / 2);
@@ -458,7 +379,7 @@ class DbReader {
         break;
       }
 
-      if (ipfrom <= ipnum && ipto > ipnum) {
+      if (ipfrom <= ipNum && ipto > ipNum) {
         const firstcol = ipVersion === 6 ? 16 : 4;
         const buff = this.readToBuffer(columnSize - firstcol, rowoffset + firstcol - 1);
         if (!buff) {
@@ -483,7 +404,7 @@ class DbReader {
         data.status = 'OK';
         return;
       } else {
-        if (ipfrom > ipnum) {
+        if (ipfrom > ipNum) {
           high = mid - 1;
         } else {
           low = mid + 1;
@@ -500,7 +421,7 @@ class DbReader {
    */
   public get(ip: string): Ip2lData {
     const data: Ip2lData = {
-      ip: '',
+      ip,
       ip_no: '',
       status: '',
     };
@@ -519,22 +440,13 @@ class DbReader {
       return data;
     }
 
-    if (/^[:0]+:F{4}:(\d+\.){3}\d+$/i.test(ip)) {
-      ip = ip.replace(/^[:0]+:F{4}:/i, '');
-    } else if (/^[:0]+F{4}(:[\dA-Z]{4}){2}$/i.test(ip)) {
-      let tmp = ip.replace(/^[:0]+F{4}:/i, '');
-      tmp = tmp.replace(/:/, '');
-      const tmparr = [];
-      for (let x = 0; x < 8; x = x + 2) {
-        tmparr.push(parseInt('0x' + tmp.substring(x, x + 2)));
-      }
-      ip = tmparr.join('.');
-    }
+    let ipVersion: number;
+    let ipNum: bigint;
+    ({ip, ipVersion, ipNum} = parseIp(ip));
 
-    const iptype = net.isIP(ip);
-    if (iptype === 0) {
+    if (!ipVersion) {
       data.status = 'INVALID_IP_ADDRESS';
-    } else if (iptype === 6 && this.dbStats_.OldBIN) {
+    } else if (ipVersion === 6 && this.dbStats_.OldBIN) {
       data.status = 'IPV6_NOT_SUPPORTED';
     }
 
@@ -542,7 +454,9 @@ class DbReader {
       return data;
     }
 
-    this.query(ip, iptype, data);
+    data.ip_no = ipNum.toString();
+
+    this.query(ipNum, ipVersion, data);
     return data;
   }
 }
