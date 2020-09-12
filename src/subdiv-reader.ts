@@ -2,7 +2,7 @@ import fs, {FSWatcher} from 'fs';
 import readline from 'readline';
 
 interface SubdivisionMap {
-  [key: string]: {[key: string]: string | undefined};
+  [key: string]: {[key: string]: string | undefined} | undefined;
 }
 
 enum ReaderStatus {
@@ -53,10 +53,10 @@ class SubdivReader {
           const country = match[1];
           const region = match[2];
           const subdivision = match[3];
-          if (!subdivisionMap[country]) {
-            subdivisionMap[country] = {};
-          }
-          subdivisionMap[country][region] = subdivision;
+          // Less than pretty workaround for ts(2532)
+          const countryMap = subdivisionMap[country] || {};
+          countryMap[region] = subdivision;
+          subdivisionMap[country] = countryMap;
         }
       }
     };
@@ -137,7 +137,7 @@ class SubdivReader {
       return '';
     }
 
-    const isoCode = this.subdivisionMap_[country] && this.subdivisionMap_[country][region];
+    const isoCode = (this.subdivisionMap_[country] || {})[region];
     return isoCode && isoCode.length > 3 ? isoCode.substring(3) : '';
   }
 }
