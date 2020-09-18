@@ -79,7 +79,7 @@ function getIpNum(ip: string, ipVersion: number): {ipNum: bigint; ipVersion: num
 
     ipNum = total;
 
-    // Check whther this is a 6to4 or Toredo address, and if
+    // Check whther this is a 6to4 or Teredo address, and if
     // so, extract the IPv4 number.
     if (ipNum >= FROM_6TO4 && ipNum <= TO_6TO4) {
       // Sample: 2002:808:808:: --> 8.8.8.8
