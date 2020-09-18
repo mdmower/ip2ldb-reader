@@ -37,6 +37,9 @@ const ipv4data = ip2lReader.get('8.8.8.8');
 
 ```JavaScript
 {
+  // {boolean} Cache database in memory
+  cacheDatabaseInMemory: false,
+
   // {boolean} Watch filesystem for database updates and reload if detected
   reloadOnDbUpdate: false,
 
@@ -50,7 +53,10 @@ const ipv4data = ip2lReader.get('8.8.8.8');
 
 **Additional information**
 
-- `reloadOnDbUpdate` - When enabled, the database file is monitored for changes with a 500ms debounce. On the leading edge, the database reader is put into the `INITIALIZING` state so that attempts to read from the database short circuit and do not touch the filesystem. The updated database is reloaded on the trailing edge of the debounce. This means there is a minimum of 500ms where geolocation requests will receive `{status: "INITIALIZING"}` responses.
+- `cacheDatabaseInMemory` - Read entire database into memory on intialization.
+- `reloadOnDbUpdate` - When enabled, the database file is monitored for changes with a 500ms debounce.
+  - If `cacheDatabaseInMemory` is `false` (the default case), the database reader is put into the `INITIALIZING` state on the leading edge of the debounce. Attempts to read from the database short circuit and do not touch the filesystem. The updated database is reloaded on the trailing edge of the debounce. This means there is a minimum of 500ms where geolocation requests will receive `{status: "INITIALIZING"}` responses.
+  - If `cacheDatabaseInMemory` is `true`, the reader will continue to return results from the cached databse while the updated database loads. There is no interruption in service.
 - `subdivisionCsvPath` - When a filesystem path to the [IP2Location ISO 3166-2 Subdivision Code CSV database](https://www.ip2location.com/free/iso3166-2) is provided, the country code and region will be used to identify the corresponding subdivision code.
 - `geoNameIdCsvPath` - When a filesystem path to the [IP2Location GeoName ID CSV database](https://www.ip2location.com/free/geoname-id) is provided, the country code, region, and city will be used to identify the corresponding GeoName ID.
 
@@ -64,28 +70,28 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
   ip_no: string | null;
   status: string | null;
 
-  country_short?: string;
-  country_long?: string;
-  subdivision?: string;
-  region?: string;
+  areacode?: string;
   city?: string;
+  country_long?: string;
+  country_short?: string;
+  domain?: string;
+  elevation?: string;
+  geoname_id?: number;
+  iddcode?: string;
   isp?: string;
   latitude?: number;
   longitude?: number;
-  domain?: string;
-  zipcode?: string;
-  timezone?: string;
-  netspeed?: string;
-  iddcode?: string;
-  areacode?: string;
-  weatherstationcode?: string;
-  weatherstationname?: string;
   mcc?: string;
   mnc?: string;
   mobilebrand?: string;
-  elevation?: string;
+  netspeed?: string;
+  region?: string;
+  subdivision?: string;
+  timezone?: string;
   usagetype?: string;
-  geoname_id?: number;
+  weatherstationcode?: string;
+  weatherstationname?: string;
+  zipcode?: string;
 }
 ```
 
@@ -104,7 +110,7 @@ Properties suffixed by `?` only exist if the database supports them. For example
 Possible values for `status` include:
 
 - `OK` - Successful search for geolocation data
-- `INITIALIZING` - Database reader is still initializing and is not ready to receive requests
+- `INITIALIZING` - Database reader is initializing and is not ready to receive requests
 - `NOT_INITIALIZED` - Database reader failed to initialize
 - `IP_ADDRESS_NOT_FOUND` - IP address has correct format, but database does not contain data for it
 - `INVALID_IP_ADDRESS` - IP address does not have correct format

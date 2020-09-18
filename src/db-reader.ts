@@ -40,7 +40,9 @@ enum ReaderStatus {
 class DbReader {
   private readerStatus_: ReaderStatus;
   private dbPath_: string | null;
+  private cacheInMemory_: boolean;
   private fd_: number | null;
+  private dbCache_: Buffer | null;
   private fsWatcher_: FSWatcher | null;
   private indiciesIPv4_: number[][];
   private indiciesIPv6_: number[][];
@@ -68,7 +70,9 @@ class DbReader {
   constructor() {
     this.readerStatus_ = ReaderStatus.NotInitialized;
     this.dbPath_ = null;
+    this.cacheInMemory_ = false;
     this.fd_ = null;
+    this.dbCache_ = null;
     this.fsWatcher_ = null;
 
     this.indiciesIPv4_ = [];
@@ -104,6 +108,13 @@ class DbReader {
    * @param pos Offset from beginning of database
    */
   private readToBuffer(readbytes: number, pos: number): Buffer | undefined {
+    if (this.dbCache_) {
+      // TODO: A readonly buffer would be nice
+      // https://github.com/nodejs/node/issues/27080
+      const buff = this.dbCache_.subarray(pos, pos + readbytes);
+      return buff.length === readbytes ? buff : undefined;
+    }
+
     if (!this.fd_) {
       throw new Error('Missing file descriptor, cannot read data');
     }
@@ -200,18 +211,28 @@ class DbReader {
   }
 
   /**
-   * Load database
-   * @param dbPath IP2Location BIN database
+   * (Re)load database
    */
-  private loadDatabase(dbPath: string): void {
-    this.dbPath_ = dbPath;
+  private loadDatabase(): void {
+    if (!this.dbPath_) {
+      throw new Error('Path to database not available');
+    }
+
+    this.readerStatus_ = ReaderStatus.Initializing;
 
     if (this.fd_ !== null) {
       try {
         fs.closeSync(this.fd_);
       } catch (ex) {}
     }
-    this.fd_ = fs.openSync(this.dbPath_, 'r');
+
+    if (this.cacheInMemory_) {
+      this.fd_ = null;
+      this.dbCache_ = fs.readFileSync(this.dbPath_);
+    } else {
+      this.fd_ = fs.openSync(this.dbPath_, 'r');
+      this.dbCache_ = null;
+    }
 
     this.dbStats_.DBType = this.readInt8(1) || 0;
     this.dbStats_.DBColumn = this.readInt8(2) || 0;
@@ -262,6 +283,8 @@ class DbReader {
         }
       }
     }
+
+    this.readerStatus_ = ReaderStatus.Ready;
   }
 
   /**
@@ -274,32 +297,28 @@ class DbReader {
       throw new Error('Must specify path to database');
     }
 
-    this.readerStatus_ = ReaderStatus.Initializing;
+    this.dbPath_ = dbPath;
+    this.cacheInMemory_ = options?.cacheDatabaseInMemory || false;
 
-    this.loadDatabase(dbPath);
+    this.loadDatabase();
 
     if (options && options.reloadOnDbUpdate) {
-      this.watchDbFile(dbPath);
+      this.watchDbFile();
     }
-
-    this.readerStatus_ = ReaderStatus.Ready;
   }
 
   /**
    * Watch database file for changes and re-init if a change is detected
-   * @param dbPath Path to watch
    */
-  private watchDbFile(dbPath: string): void {
+  private watchDbFile(): void {
     let timeout: NodeJS.Timeout | null = null;
-    let originalState: ReaderStatus = this.readerStatus_;
+    const originalState: ReaderStatus = this.readerStatus_;
 
     const dbChangeHandler = (filename: string) => {
-      if (filename && fs.existsSync(dbPath)) {
-        if (this.fsWatcher_ !== null) {
-          this.fsWatcher_.close();
-          this.fsWatcher_ = null;
-        }
-        this.init(dbPath, <Ip2lOptions>{reloadOnDbUpdate: true});
+      if (filename && this.dbPath_ && fs.existsSync(this.dbPath_)) {
+        this.fsWatcher_?.close();
+        this.loadDatabase();
+        this.fsWatcher_ = getFsWatch();
       } else {
         // TODO: This isn't terrific, since the reader status will be
         // marked as 'Ready' if a database suddenly disappears. It
@@ -311,20 +330,31 @@ class DbReader {
       }
     };
 
-    this.fsWatcher_ = fs.watch(dbPath, (eventType, filename) => {
-      // Use a 500ms debounce on database changes before init re-runs,
-      // but mark as initializing right away to avoid attempts to read
-      // from the old file descriptor.
-      originalState = this.readerStatus_;
-      this.readerStatus_ = ReaderStatus.Initializing;
-      if (timeout !== null) {
-        clearTimeout(timeout);
+    const getFsWatch = (): fs.FSWatcher => {
+      if (!this.dbPath_) {
+        throw new Error('Path to database not available');
       }
-      timeout = setTimeout(() => {
-        timeout = null;
-        dbChangeHandler(filename);
-      }, 500);
-    });
+
+      return fs.watch(this.dbPath_, (eventType, filename) => {
+        // Use a 500ms debounce on database changes before database reloads.
+        // If we are reading from a database on disk (the default case), we
+        // need to flag the reader as initializing right away to avoid
+        // reading from the old file descriptor.
+        if (this.fd_) {
+          this.readerStatus_ = ReaderStatus.Initializing;
+        }
+
+        if (timeout !== null) {
+          clearTimeout(timeout);
+        }
+        timeout = setTimeout(() => {
+          timeout = null;
+          dbChangeHandler(filename);
+        }, 500);
+      });
+    };
+
+    this.fsWatcher_ = getFsWatch();
   }
 
   /**
@@ -430,7 +460,7 @@ class DbReader {
       data.status = 'NOT_INITIALIZED';
     } else if (this.readerStatus_ === ReaderStatus.Initializing) {
       data.status = 'INITIALIZING';
-    } else if (!this.dbPath_ || !fs.existsSync(this.dbPath_)) {
+    } else if (!this.dbPath_ || (!this.dbCache_ && !fs.existsSync(this.dbPath_))) {
       data.status = 'DATABASE_NOT_FOUND';
     } else if (!this.dbStats_.DBType) {
       data.status = 'NOT_INITIALIZED';

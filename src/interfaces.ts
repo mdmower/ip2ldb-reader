@@ -5,6 +5,11 @@ export interface Ip2lOptions {
   reloadOnDbUpdate?: boolean;
 
   /**
+   * Cache database in memory (default: false)
+   */
+  cacheDatabaseInMemory?: boolean;
+
+  /**
    * Path to IP2Location subdivision CSV database (default: undefined)
    */
   subdivisionCsvPath?: string;
