@@ -31,6 +31,9 @@ await ip2lReader.init('/path/to/database.bin', options);
 // Get geolocation data for IP addresses
 const ipv6data = ip2lReader.get('2001:4860:4860::8888');
 const ipv4data = ip2lReader.get('8.8.8.8');
+
+// Close the database and uninitialize the reader
+ip2lReader.close();
 ```
 
 ## Options
