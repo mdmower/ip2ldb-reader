@@ -5,13 +5,11 @@ import {GeoNameIdReader} from './geonameid-reader';
 
 export default class Ip2lReader {
   private dbReader_: DbReader;
-  private subdivReader_: SubdivReader | undefined;
-  private geoNameIdReader_: GeoNameIdReader | undefined;
+  private subdivReader_?: SubdivReader;
+  private geoNameIdReader_?: GeoNameIdReader;
 
   constructor() {
     this.dbReader_ = new DbReader();
-    this.subdivReader_ = undefined;
-    this.geoNameIdReader_ = undefined;
   }
 
   /**
@@ -75,6 +73,15 @@ export default class Ip2lReader {
     }
 
     return ip2lData;
+  }
+
+  /**
+   * Close IP2Location database(s) and uninitialize reader(s)
+   */
+  public close(): void {
+    this.dbReader_.close();
+    this.subdivReader_?.close();
+    this.geoNameIdReader_?.close();
   }
 }
 

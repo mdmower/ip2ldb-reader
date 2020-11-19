@@ -156,6 +156,13 @@ const loopTest = (ip2Location: Ip2lReader) => {
       subdivisionCsvPath: subdivisionFilename ? './database/' + subdivisionFilename : undefined,
       geoNameIdCsvPath: geoNameIdFilename ? './database/' + geoNameIdFilename : undefined,
     });
+    // ip2Location.close();
+    // await ip2Location.init('./database/' + databaseFilename, {
+    //   reloadOnDbUpdate: true,
+    //   /* cacheDatabaseInMemory: false, */
+    //   subdivisionCsvPath: subdivisionFilename ? './database/' + subdivisionFilename : undefined,
+    //   geoNameIdCsvPath: geoNameIdFilename ? './database/' + geoNameIdFilename : undefined,
+    // });
   } catch (ex) {
     return exitWithError(
       'Failed to initialize IP2Location' + (ex instanceof Error ? '\n' + ex.message : '')

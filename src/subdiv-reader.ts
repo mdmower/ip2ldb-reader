@@ -72,6 +72,21 @@ class SubdivReader {
   }
 
   /**
+   * Close database and uninitialize reader
+   */
+  public close(): void {
+    this.readerStatus_ = ReaderStatus.NotInitialized;
+
+    if (this.fsWatcher_ !== null) {
+      this.fsWatcher_.close();
+    }
+
+    this.dbPath_ = null;
+    this.fsWatcher_ = null;
+    this.subdivisionMap_ = null;
+  }
+
+  /**
    * Initialize reader
    * @param dbPath IP2Location BIN database
    * @param reloadOnDbUpdate Options for database reader

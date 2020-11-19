@@ -288,6 +288,55 @@ class DbReader {
   }
 
   /**
+   * Close database and uninitialize reader
+   */
+  public close(): void {
+    this.readerStatus_ = ReaderStatus.NotInitialized;
+
+    if (this.fd_ !== null) {
+      try {
+        fs.closeSync(this.fd_);
+      } catch (ex) {}
+    }
+
+    if (this.fsWatcher_ !== null) {
+      this.fsWatcher_.close();
+    }
+
+    this.dbPath_ = null;
+    this.cacheInMemory_ = false;
+    this.fd_ = null;
+    this.dbCache_ = null;
+    this.fsWatcher_ = null;
+
+    this.indiciesIPv4_ = [];
+    this.indiciesIPv6_ = [];
+
+    this.offset_ = {};
+
+    this.enabled_ = {};
+
+    this.dbStats_ = {
+      DBType: 0,
+      DBColumn: 0,
+      DBYear: 0,
+      DBMonth: 0,
+      DBDay: 0,
+      DBCount: 0,
+      DBCountIPv6: 0,
+      BaseAddr: 0,
+      BaseAddrIPv6: 0,
+      IndexBaseAddr: 0,
+      IndexBaseAddrIPv6: 0,
+      ColumnSize: 0,
+      ColumnSizeIPv6: 0,
+      Indexed: false,
+      IndexedIPv6: false,
+      OldBIN: false,
+    };
+  }
+
+  /**
    * Initialize IP2Location database reader
    * @param dbPath IP2Location BIN database
    * @param options Options for database reader
