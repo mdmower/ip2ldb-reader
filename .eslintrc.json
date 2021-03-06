@@ -13,12 +13,10 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier",
-    "prettier/@typescript-eslint",
     "plugin:jsdoc/recommended"
   ],
   "rules": {
     "prettier/prettier": ["error"],
-    "no-undef": "error",
     "no-var": "error",
     "prefer-const": [
       "error",
