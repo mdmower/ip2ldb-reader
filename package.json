@@ -1,6 +1,6 @@
 {
   "name": "ip2ldb-reader",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Reader for IP2Location databases",
   "main": "lib/index.js",
   "scripts": {
@@ -32,15 +32,15 @@
   },
   "homepage": "https://github.com/mdmower/ip2ldb-reader#readme",
   "devDependencies": {
-    "@types/node": "^14.14.31",
-    "@typescript-eslint/eslint-plugin": "^4.16.1",
-    "@typescript-eslint/parser": "^4.16.1",
-    "eslint": "^7.21.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-jsdoc": "^32.2.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "fs-extra": "^9.1.0",
-    "prettier": "^2.2.1",
-    "typescript": "^4.2.3"
+    "@types/node": "^16.7.10",
+    "@typescript-eslint/eslint-plugin": "^4.30.0",
+    "@typescript-eslint/parser": "^4.30.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jsdoc": "^36.0.8",
+    "eslint-plugin-prettier": "^4.0.0",
+    "fs-extra": "^10.0.0",
+    "prettier": "^2.3.2",
+    "typescript": "^4.4.2"
   }
 }
