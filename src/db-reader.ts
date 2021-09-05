@@ -257,6 +257,18 @@ class DbReader {
     this.dbStats_.ProductType = this.readInt8(31) || 0;
     this.dbStats_.FileSize = this.readInt32(32) || 0;
 
+    // Check if this is a valid BIN. ProductCode should be 1 for BIN files from Jan 2021 onwards.
+    if (this.dbStats_.ProductCode !== 1 && this.dbStats_.DBYear >= 21) {
+      throw new Error(
+        'Incorrect IP2Location BIN file format. Please make sure that you are using the latest IP2Location BIN file.'
+      );
+    }
+
+    // Check whether this is a zip file (PK would be the first 2 chars).
+    if (this.dbStats_.DBType == 'P'.charCodeAt(0) && this.dbStats_.DBColumn === 'K'.charCodeAt(0)) {
+      throw new Error('Incorrect IP2Location BIN file format. Please uncompress zip file.');
+    }
+
     this.dbStats_.Indexed = this.dbStats_.IndexBaseAddr > 0;
     this.dbStats_.OldBIN = !this.dbStats_.DBCountIPv6;
     this.dbStats_.IndexedIPv6 = !this.dbStats_.OldBIN && this.dbStats_.IndexBaseAddrIPv6 > 0;
