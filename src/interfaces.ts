@@ -144,6 +144,16 @@ export interface Ip2lData {
   usagetype?: string;
 
   /**
+   * Address type
+   */
+  addresstype?: string;
+
+  /**
+   * IAB category
+   */
+  category?: string;
+
+  /**
    * GeoName ID
    */
   geoname_id?: number;

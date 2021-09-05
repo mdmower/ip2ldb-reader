@@ -73,7 +73,9 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
   ip_no: string | null;
   status: string | null;
 
+  addresstype?: string;
   areacode?: string;
+  category?: string;
   city?: string;
   country_long?: string;
   country_short?: string;
