@@ -311,6 +311,13 @@ class DbReader {
   }
 
   /**
+   * Get reader status
+   */
+  public get readerStatus(): ReaderStatus {
+    return this.readerStatus_;
+  }
+
+  /**
    * Close database and uninitialize reader
    */
   public close(): void {
@@ -566,4 +573,4 @@ class DbReader {
   }
 }
 
-export {DbReader};
+export {DbReader, ReaderStatus};

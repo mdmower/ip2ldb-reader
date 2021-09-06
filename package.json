@@ -12,7 +12,8 @@
     "build": "npm run lint && npm run compile",
     "build-release": "npm run lint && npm run compile-release",
     "prepublishOnly": "npm run clean && npm run build-release",
-    "cli-testing": "node lib/cli.testing.js"
+    "test": "jest",
+    "cli-testing": "node lib/cli-testing.js"
   },
   "files": [
     "lib/**/*"
@@ -31,7 +32,16 @@
     "url": "https://github.com/mdmower/ip2ldb-reader/issues"
   },
   "homepage": "https://github.com/mdmower/ip2ldb-reader#readme",
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "verbose": true,
+    "modulePathIgnorePatterns": [
+      "<rootDir>/lib/"
+    ]
+  },
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "@types/node": "^16.7.10",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
@@ -40,7 +50,10 @@
     "eslint-plugin-jsdoc": "^36.0.8",
     "eslint-plugin-prettier": "^4.0.0",
     "fs-extra": "^10.0.0",
+    "jest": "^27.1.0",
     "prettier": "^2.3.2",
+    "ts-jest": "^27.0.5",
+    "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   }
 }

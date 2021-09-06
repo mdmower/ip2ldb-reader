@@ -15,12 +15,14 @@ class GeoNameIdReader {
   private readerStatus_: ReaderStatus;
   private dbPath_: string | null;
   private fsWatcher_: FSWatcher | null;
+  private reloadPromise_: Promise<void>;
   private geoNameIdMap_: GeoNameIdMap | null;
 
   constructor() {
     this.readerStatus_ = ReaderStatus.NotInitialized;
     this.dbPath_ = null;
     this.fsWatcher_ = null;
+    this.reloadPromise_ = Promise.resolve();
     this.geoNameIdMap_ = null;
   }
 
@@ -75,6 +77,20 @@ class GeoNameIdReader {
   }
 
   /**
+   * Get reader status
+   */
+  public get readerStatus(): ReaderStatus {
+    return this.readerStatus_;
+  }
+
+  /**
+   * Get DB reload promise
+   */
+  public get reloadPromise(): Promise<void> {
+    return this.reloadPromise_;
+  }
+
+  /**
    * Close database and uninitialize reader
    */
   public close(): void {
@@ -102,10 +118,10 @@ class GeoNameIdReader {
     this.readerStatus_ = ReaderStatus.Initializing;
     this.dbPath_ = dbPath;
 
-    await this.loadGeoNameIdMap(this.dbPath_);
+    await this.loadGeoNameIdMap(dbPath);
 
     if (reloadOnDbUpdate) {
-      this.watchDbFile(this.dbPath_);
+      this.watchDbFile(dbPath);
     }
 
     this.readerStatus_ = ReaderStatus.Ready;
@@ -124,7 +140,7 @@ class GeoNameIdReader {
           this.fsWatcher_.close();
           this.fsWatcher_ = null;
         }
-        this.init(dbPath, true).catch(() => undefined);
+        this.reloadPromise_ = this.init(dbPath, true).catch(() => undefined);
       }
     };
 
@@ -161,4 +177,4 @@ class GeoNameIdReader {
   }
 }
 
-export {GeoNameIdReader};
+export {GeoNameIdReader, ReaderStatus};

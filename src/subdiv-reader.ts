@@ -15,12 +15,14 @@ class SubdivReader {
   private readerStatus_: ReaderStatus;
   private dbPath_: string | null;
   private fsWatcher_: FSWatcher | null;
+  private reloadPromise_: Promise<void>;
   private subdivisionMap_: SubdivisionMap | null;
 
   constructor() {
     this.readerStatus_ = ReaderStatus.NotInitialized;
     this.dbPath_ = null;
     this.fsWatcher_ = null;
+    this.reloadPromise_ = Promise.resolve();
     this.subdivisionMap_ = null;
   }
 
@@ -72,6 +74,20 @@ class SubdivReader {
   }
 
   /**
+   * Get reader status
+   */
+  public get readerStatus(): ReaderStatus {
+    return this.readerStatus_;
+  }
+
+  /**
+   * Get DB reload promise
+   */
+  public get reloadPromise(): Promise<void> {
+    return this.reloadPromise_;
+  }
+
+  /**
    * Close database and uninitialize reader
    */
   public close(): void {
@@ -99,10 +115,10 @@ class SubdivReader {
     this.readerStatus_ = ReaderStatus.Initializing;
     this.dbPath_ = dbPath;
 
-    await this.loadSubdivisionMap(this.dbPath_);
+    await this.loadSubdivisionMap(dbPath);
 
     if (reloadOnDbUpdate) {
-      this.watchDbFile(this.dbPath_);
+      this.watchDbFile(dbPath);
     }
 
     this.readerStatus_ = ReaderStatus.Ready;
@@ -121,7 +137,7 @@ class SubdivReader {
           this.fsWatcher_.close();
           this.fsWatcher_ = null;
         }
-        this.init(dbPath, true).catch(() => undefined);
+        this.reloadPromise_ = this.init(dbPath, true).catch(() => undefined);
       }
     };
 
@@ -157,4 +173,4 @@ class SubdivReader {
   }
 }
 
-export {SubdivReader};
+export {SubdivReader, ReaderStatus};
