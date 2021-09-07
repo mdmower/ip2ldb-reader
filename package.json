@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint src",
     "format": "prettier --write \"src/**/*.ts\"",
-    "clean": "node build/clean.js",
+    "clean": "rimraf lib",
     "compile": "tsc --build tsconfig.json",
     "compile-release": "tsc --build tsconfig.release.json",
     "build": "npm run lint && npm run compile",
@@ -52,6 +52,7 @@
     "fs-extra": "^10.0.0",
     "jest": "^27.1.0",
     "prettier": "^2.3.2",
+    "rimraf": "^3.0.2",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
