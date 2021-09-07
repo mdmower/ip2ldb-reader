@@ -130,3 +130,16 @@ When no geolocation data is available for a supported property in the return obj
 ## Known issues
 
 IP2Location databases store `latitude = 0` and `longitude = 0` when no coordinates are known for an IP. Unfortunately, this is a real location: [Null Island](https://en.wikipedia.org/wiki/Null_Island). This reader cannot determine for certain whether the coordinates are real or not known, so no attempt is made at invalidating them in the return object.
+
+## Development
+
+See available build, lint, clean, etc. scripts with `npm run`.
+
+Unit tests require the following database files to be made available in folder `database` within the project directory:
+
+- [IP2LOCATION-ISO3166-2.CSV](https://www.ip2location.com/free/iso3166-2) - ISO 3166-2 Subdivision Code database in CSV format
+- [IP2LOCATION-GEONAMEID.CSV](https://www.ip2location.com/free/geoname-id) - GeoName ID database in CSV format
+- [IP2LOCATION-LITE-DB1.BIN](https://lite.ip2location.com/database/db1-ip-country) - LITE IP-COUNTRY DB1 IPv4 database in BIN format
+- [IP2LOCATION-SAMPLE-DB25.IPV6.BIN](https://www.ip2location.com/database/db25-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category) - Sample DB25 IPv6 database in BIN format
+
+Note that the _sample_ DB25 database is expected for unit tests, not the full, paid database.
