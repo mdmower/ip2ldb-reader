@@ -20,7 +20,7 @@ describe('Multiple DB readers', () => {
       ? describe
       : describe.skip;
 
-  conditionalDescribeMulti('Multiple readers', () => {
+  conditionalDescribeMulti('Identify using multiple readers', () => {
     let dbReader: Ip2lReader;
 
     beforeAll(async () => {
@@ -109,9 +109,11 @@ describe('Multiple DB readers', () => {
         geoNameIdCsvPath: geonameidDbPath,
         subdivisionCsvPath: subdivDbPath,
       });
-      const {status, country_short} = dbReader.get(testIp);
+      const {status, country_short, geoname_id, subdivision} = dbReader.get(testIp);
       expect(status).toEqual('OK');
       expect(country_short).toEqual('US');
+      expect(geoname_id).toEqual(5375481);
+      expect(subdivision).toEqual('CA');
     });
   });
 });
