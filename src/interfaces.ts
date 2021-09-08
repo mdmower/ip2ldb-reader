@@ -18,10 +18,89 @@ export interface Ip2lOptions {
    * Path to IP2Location GeoNameID CSV database (default: undefined)
    */
   geoNameIdCsvPath?: string;
+
+  /**
+   * Path to IP2Location Country Info CSV database (default: undefined)
+   */
+  countryInfoCsvPath?: string;
+}
+
+export interface CountryInfoData {
+  [key: string]: string | number | null | undefined;
+
+  /**
+   * Country name based on ISO 3166
+   */
+  country_name?: string | null;
+
+  /**
+   * Three-character country code based on ISO 3166
+   */
+  country_alpha3_code?: string | null;
+
+  /**
+   * Three-character country numeric code based on ISO 3166
+   */
+  country_numeric_code?: number | null;
+
+  /**
+   * Capital of the country
+   */
+  capital: string | null;
+
+  /**
+   * Demonym of the country
+   */
+  country_demonym?: string | null;
+
+  /**
+   * Total area in square-km
+   */
+  total_area: number | null;
+
+  /**
+   * Population of year 2014
+   */
+  population?: number | null;
+
+  /**
+   * The IDD prefix to call the city from another country
+   */
+  idd_code?: number | null;
+
+  /**
+   * Currency code based on ISO 4217
+   */
+  currency_code?: string | null;
+
+  /**
+   * Currency name
+   */
+  currency_name?: string | null;
+
+  /**
+   * Currency symbol
+   */
+  currency_symbol?: string | null;
+
+  /**
+   * Language code based on ISO 639
+   */
+  lang_code?: string | null;
+
+  /**
+   * Language name
+   */
+  lang_name?: string | null;
+
+  /**
+   * Country-Code Top-Level Domain
+   */
+  cctld?: string | null;
 }
 
 export interface Ip2lData {
-  [key: string]: string | number | null | undefined;
+  [key: string]: string | number | CountryInfoData | null | undefined;
 
   /**
    * IP address
@@ -47,6 +126,11 @@ export interface Ip2lData {
    * Country name
    */
   country_long?: string;
+
+  /**
+   * Country info
+   */
+  country_info?: CountryInfoData | null;
 
   /**
    * Subdivision part of ISO 3166-2 country-subdivision code

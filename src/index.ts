@@ -2,11 +2,13 @@ import {DbReader} from './db-reader';
 import {Ip2lOptions, Ip2lData} from './interfaces';
 import {SubdivReader} from './subdiv-reader';
 import {GeoNameIdReader} from './geonameid-reader';
+import {CountryInfoReader} from './country-info-reader';
 
 export default class Ip2lReader {
   private dbReader_: DbReader;
   private subdivReader_?: SubdivReader;
   private geoNameIdReader_?: GeoNameIdReader;
+  private countryInfoReader_?: CountryInfoReader;
 
   constructor() {
     this.dbReader_ = new DbReader();
@@ -35,6 +37,12 @@ export default class Ip2lReader {
       this.geoNameIdReader_ = new GeoNameIdReader();
       await this.geoNameIdReader_.init(options.geoNameIdCsvPath, options.reloadOnDbUpdate);
     }
+
+    // Country info support
+    if (options.countryInfoCsvPath) {
+      this.countryInfoReader_ = new CountryInfoReader();
+      await this.countryInfoReader_.init(options.countryInfoCsvPath, options.reloadOnDbUpdate);
+    }
   }
 
   /**
@@ -49,7 +57,7 @@ export default class Ip2lReader {
       if (typeof ip2lData.country_short === 'string' && typeof ip2lData.region === 'string') {
         const subdivision = this.subdivReader_.get(ip2lData.country_short, ip2lData.region);
         if (subdivision !== null) {
-          ip2lData['subdivision'] = subdivision;
+          ip2lData.subdivision = subdivision;
         }
       }
     }
@@ -67,8 +75,16 @@ export default class Ip2lReader {
           ip2lData.city
         );
         if (geoNameId !== null) {
-          ip2lData['geoname_id'] = geoNameId;
+          ip2lData.geoname_id = geoNameId;
         }
+      }
+    }
+
+    // Country info support is optional
+    if (this.countryInfoReader_) {
+      if (typeof ip2lData.country_short === 'string') {
+        const countryInfo = this.countryInfoReader_.get(ip2lData.country_short);
+        ip2lData.country_info = countryInfo;
       }
     }
 
@@ -82,6 +98,7 @@ export default class Ip2lReader {
     this.dbReader_.close();
     this.subdivReader_?.close();
     this.geoNameIdReader_?.close();
+    this.countryInfoReader_?.close();
   }
 }
 

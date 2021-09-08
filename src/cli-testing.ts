@@ -114,6 +114,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
 
   let subdivisionFilename: string | undefined;
   let geoNameIdFilename: string | undefined;
+  let countryInfoFilename: string | undefined;
   if (csvSelection.length) {
     console.log('\nAvailable CSV databases:\n' + csvSelection.join('\n') + '\n');
     const selectedSubdivision = await new Promise<string>((resolve) => {
@@ -135,6 +136,16 @@ const loopTest = (ip2Location: Ip2lReader) => {
     } else if (selectedGeoNameId) {
       console.log('Invalid GeoName ID selection');
     }
+
+    const selectedCountryInfo = await new Promise<string>((resolve) => {
+      rl.question('Select a country info database by number (optional): ', resolve);
+    });
+
+    if (/^\d+$/.test(selectedCountryInfo)) {
+      countryInfoFilename = csvFiles[parseInt(selectedCountryInfo) - 1]?.name;
+    } else if (selectedCountryInfo) {
+      console.log('Invalid country info selection');
+    }
   }
 
   console.log('\nLoading database(s):');
@@ -155,6 +166,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
       /* cacheDatabaseInMemory: false, */
       subdivisionCsvPath: subdivisionFilename ? './database/' + subdivisionFilename : undefined,
       geoNameIdCsvPath: geoNameIdFilename ? './database/' + geoNameIdFilename : undefined,
+      countryInfoCsvPath: countryInfoFilename ? './database/' + countryInfoFilename : undefined,
     });
     // ip2Location.close();
     // await ip2Location.init('./database/' + databaseFilename, {

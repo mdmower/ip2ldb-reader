@@ -14,9 +14,16 @@ describe('Multiple DB readers', () => {
   // Requires CSV subdivision database from https://www.ip2location.com/free/iso3166-2
   // to be decompressed and made available in /database folder within project directory.
   const subdivDbPath = 'database/IP2LOCATION-ISO3166-2.CSV';
+  // Requires "more information" CSV subdivision database from
+  // https://www.ip2location.com/free/country-information
+  // to be decompressed and made available in /database folder within project directory.
+  const countryInfoDbPath = 'database/IP2LOCATION-COUNTRY-INFORMATION.CSV';
 
   const conditionalDescribeMulti =
-    fs.existsSync(db25Path) && fs.existsSync(subdivDbPath) && fs.existsSync(geonameidDbPath)
+    fs.existsSync(db25Path) &&
+    fs.existsSync(subdivDbPath) &&
+    fs.existsSync(geonameidDbPath) &&
+    fs.existsSync(countryInfoDbPath)
       ? describe
       : describe.skip;
 
@@ -28,6 +35,7 @@ describe('Multiple DB readers', () => {
       await dbReader.init(db25Path, {
         geoNameIdCsvPath: geonameidDbPath,
         subdivisionCsvPath: subdivDbPath,
+        countryInfoCsvPath: countryInfoDbPath,
       });
     });
 
@@ -49,8 +57,17 @@ describe('Multiple DB readers', () => {
         status: 'OK',
       };
 
-      const {country_short, geoname_id, ip, ip_no, latitude, longitude, status, subdivision} =
-        dbResult;
+      const {
+        country_short,
+        geoname_id,
+        ip,
+        ip_no,
+        latitude,
+        longitude,
+        status,
+        subdivision,
+        country_info,
+      } = dbResult;
       expect(country_short).toEqual(expectedResultPartial.country_short);
       expect(geoname_id).toEqual(5375481);
       expect(ip).toEqual(expectedResultPartial.ip);
@@ -59,6 +76,7 @@ describe('Multiple DB readers', () => {
       expect(longitude).toBeCloseTo(expectedResultPartial.longitude);
       expect(status).toEqual(expectedResultPartial.status);
       expect(subdivision).toEqual('CA');
+      expect(country_info?.idd_code).toEqual(1);
     });
 
     it('Contains all possible keys', () => {
@@ -67,6 +85,7 @@ describe('Multiple DB readers', () => {
         'areacode',
         'category',
         'city',
+        'country_info',
         'country_long',
         'country_short',
         'domain',
@@ -108,12 +127,14 @@ describe('Multiple DB readers', () => {
       await dbReader.init(db25Path, {
         geoNameIdCsvPath: geonameidDbPath,
         subdivisionCsvPath: subdivDbPath,
+        countryInfoCsvPath: countryInfoDbPath,
       });
-      const {status, country_short, geoname_id, subdivision} = dbReader.get(testIp);
+      const {status, country_short, geoname_id, subdivision, country_info} = dbReader.get(testIp);
       expect(status).toEqual('OK');
       expect(country_short).toEqual('US');
       expect(geoname_id).toEqual(5375481);
       expect(subdivision).toEqual('CA');
+      expect(country_info?.idd_code).toEqual(1);
     });
   });
 });
