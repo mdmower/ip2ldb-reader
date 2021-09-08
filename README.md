@@ -59,7 +59,7 @@ ip2lReader.close();
 - `cacheDatabaseInMemory` - Read entire database into memory on intialization.
 - `reloadOnDbUpdate` - When enabled, the database file is monitored for changes with a 500ms debounce.
   - If `cacheDatabaseInMemory` is `false` (the default case), the database reader is put into the `INITIALIZING` state on the leading edge of the debounce. Attempts to read from the database short circuit and do not touch the filesystem. The updated database is reloaded on the trailing edge of the debounce. This means there is a minimum of 500ms where geolocation requests will receive `{status: "INITIALIZING"}` responses.
-  - If `cacheDatabaseInMemory` is `true`, the reader will continue to return results from the cached databse while the updated database loads. There is no interruption in service.
+  - If `cacheDatabaseInMemory` is `true`, the reader will continue to return results from the cached database while the updated database loads. There is no interruption in service.
 - `subdivisionCsvPath` - When a filesystem path to the [IP2Location ISO 3166-2 Subdivision Code CSV database](https://www.ip2location.com/free/iso3166-2) is provided, the country code and region will be used to identify the corresponding subdivision code.
 - `geoNameIdCsvPath` - When a filesystem path to the [IP2Location GeoName ID CSV database](https://www.ip2location.com/free/geoname-id) is provided, the country code, region, and city will be used to identify the corresponding GeoName ID.
 
