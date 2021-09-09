@@ -1,5 +1,5 @@
 import fs, {FSWatcher} from 'fs';
-import readline from 'readline';
+import csvParser from 'csv-parser';
 
 interface GeoNameIdMap {
   [key: string]: {[key: string]: {[key: string]: number | undefined} | undefined} | undefined;
@@ -31,49 +31,34 @@ class GeoNameIdReader {
    * @param csvPath Filesystem path to IP2Location CSV GeoNameID database
    */
   private async loadGeoNameIdMap(csvPath: string): Promise<void> {
-    const expectedHeader = '"country_code","region_name","city_name","geonameid"';
-    const expectedLineRe = /^"(\w{2})","([^"]+)","([^"]+)","(\d+)"$/;
-    let geoNameIdMap: GeoNameIdMap | null = {};
+    const parser = fs.createReadStream(csvPath).pipe(csvParser());
 
-    const rl = readline.createInterface({
-      input: fs.createReadStream(csvPath),
-      crlfDelay: Infinity,
-    });
+    const geoNameIdMap: GeoNameIdMap = {};
+    let firstRecord = true;
 
-    let firstLine = true;
+    for await (const record of parser) {
+      const inputData = record as {[key: string]: string};
 
-    const processLine = (line: string) => {
-      if (firstLine) {
-        if (line !== expectedHeader) {
-          geoNameIdMap = null;
-          rl.close();
-        }
-        firstLine = false;
-      } else if (geoNameIdMap !== null) {
-        const match = expectedLineRe.exec(line);
-        if (match && match[3] !== '-') {
-          const country = match[1];
-          const region = match[2];
-          const city = match[3];
-          const geonameid = parseInt(match[4]);
-          // Less than pretty workaround for ts(2532)
-          const countryMap = geoNameIdMap[country] || {};
-          const regionMap = countryMap[region] || {};
-          regionMap[city] = geonameid;
-          countryMap[region] = regionMap;
-          geoNameIdMap[country] = countryMap;
-        }
+      if (
+        firstRecord &&
+        Object.keys(inputData).filter((key) =>
+          ['country_code', 'region_name', 'city_name', 'geonameid'].includes(key)
+        ).length !== 4
+      ) {
+        throw new Error('GeoName ID database does not have expected headings');
       }
-    };
+      firstRecord = false;
 
-    return new Promise((resolve) => {
-      rl.on('line', processLine).on('close', () => {
-        if (geoNameIdMap !== null) {
-          this.geoNameIdMap_ = geoNameIdMap;
-        }
-        resolve();
-      });
-    });
+      const {country_code, region_name, city_name, geonameid} = inputData;
+
+      const countryMap = geoNameIdMap[country_code] || {};
+      const regionMap = countryMap[region_name] || {};
+      regionMap[city_name] = parseInt(geonameid);
+      countryMap[region_name] = regionMap;
+      geoNameIdMap[country_code] = countryMap;
+    }
+
+    this.geoNameIdMap_ = Object.keys(geoNameIdMap).length ? geoNameIdMap : null;
   }
 
   /**

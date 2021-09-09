@@ -23,6 +23,7 @@ describe('Country info', () => {
 
     it('Identifies US country info', () => {
       const expectedResult: CountryInfoData = {
+        country_code: 'US',
         country_name: 'United States of America',
         country_alpha3_code: 'USA',
         country_numeric_code: 840,

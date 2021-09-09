@@ -1,5 +1,5 @@
 import fs, {FSWatcher} from 'fs';
-import readline from 'readline';
+import csvParser from 'csv-parser';
 
 interface SubdivisionMap {
   [key: string]: {[key: string]: string | undefined} | undefined;
@@ -31,46 +31,32 @@ class SubdivReader {
    * @param csvPath Filesystem path to IP2Location CSV subdivision database
    */
   private async loadSubdivisionMap(csvPath: string): Promise<void> {
-    const expectedHeader = '"country_code","subdivision_name","code"';
-    const expectedLineRe = /^"(\w{2})","([^"]+)","([^"]+)"$/;
-    let subdivisionMap: SubdivisionMap | null = {};
+    const parser = fs.createReadStream(csvPath).pipe(csvParser());
 
-    const rl = readline.createInterface({
-      input: fs.createReadStream(csvPath),
-      crlfDelay: Infinity,
-    });
+    const subdivisionMap: SubdivisionMap = {};
+    let firstRecord = true;
 
-    let firstLine = true;
+    for await (const record of parser) {
+      const inputData = record as {[key: string]: string};
 
-    const processLine = (line: string) => {
-      if (firstLine) {
-        if (line !== expectedHeader) {
-          subdivisionMap = null;
-          rl.close();
-        }
-        firstLine = false;
-      } else if (subdivisionMap !== null) {
-        const match = expectedLineRe.exec(line);
-        if (match && match[3] !== '-') {
-          const country = match[1];
-          const region = match[2];
-          const subdivision = match[3];
-          // Less than pretty workaround for ts(2532)
-          const countryMap = subdivisionMap[country] || {};
-          countryMap[region] = subdivision;
-          subdivisionMap[country] = countryMap;
-        }
+      if (
+        firstRecord &&
+        Object.keys(inputData).filter((key) =>
+          ['country_code', 'subdivision_name', 'code'].includes(key)
+        ).length !== 3
+      ) {
+        throw new Error('Subdivision database does not have expected headings');
       }
-    };
+      firstRecord = false;
 
-    return new Promise((resolve) => {
-      rl.on('line', processLine).on('close', () => {
-        if (subdivisionMap !== null) {
-          this.subdivisionMap_ = subdivisionMap;
-        }
-        resolve();
-      });
-    });
+      const {country_code, subdivision_name, code} = inputData;
+
+      const countryMap = subdivisionMap[country_code] || {};
+      countryMap[subdivision_name] = code;
+      subdivisionMap[country_code] = countryMap;
+    }
+
+    this.subdivisionMap_ = Object.keys(subdivisionMap).length ? subdivisionMap : null;
   }
 
   /**

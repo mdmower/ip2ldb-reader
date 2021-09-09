@@ -29,6 +29,11 @@ export interface CountryInfoData {
   [key: string]: string | number | null | undefined;
 
   /**
+   * Two-character country code based on ISO 3166
+   */
+  country_code: string | null;
+
+  /**
    * Country name based on ISO 3166
    */
   country_name?: string | null;

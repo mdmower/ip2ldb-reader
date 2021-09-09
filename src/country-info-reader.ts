@@ -1,5 +1,5 @@
 import fs, {FSWatcher} from 'fs';
-import readline from 'readline';
+import csvParser from 'csv-parser';
 import {CountryInfoData} from './interfaces';
 
 interface CountryInfoMap {
@@ -10,11 +10,6 @@ enum ReaderStatus {
   NotInitialized = 0,
   Initializing,
   Ready,
-}
-
-enum CsvVariant {
-  Basic,
-  More,
 }
 
 class CountryInfoReader {
@@ -37,22 +32,6 @@ class CountryInfoReader {
    * @param csvPath Filesystem path to IP2Location CSV Country Info database
    */
   private async loadCountryInfoMap(csvPath: string): Promise<void> {
-    const expectedHeaderBasic = '"country_code","capital","total_area"';
-    const expectedLineBasicRe = /^"(\w{2})","([^"]*)","([^"]*)"$/;
-    const expectedHeaderMore =
-      '"country_code","country_name","country_alpha3_code","country_numeric_code","capital","country_demonym","total_area","population","idd_code","currency_code","currency_name","currency_symbol","lang_code","lang_name","cctld"';
-    const expectedLineMoreRe =
-      /^"(\w{2})","([^"]*)","([^"]*)","([\d\-]*)","([^"]*)","([^"]*)","([\d\-\.]*)","([\d\-]*)","([\d\-]*)","([^"]*)","([^"]*)","([^"]*)","([^"]*)","([^"]*)","([^"]*)"$/;
-    let countryInfoMap: CountryInfoMap | null = {};
-
-    const rl = readline.createInterface({
-      input: fs.createReadStream(csvPath),
-      crlfDelay: Infinity,
-    });
-
-    let firstLine = true;
-    let variant: CsvVariant;
-
     const normalizeStr = (val: string): string => {
       return val.replace(/^-$/, '');
     };
@@ -63,64 +42,46 @@ class CountryInfoReader {
       return num != null && !Number.isNaN(num) ? num : null;
     };
 
-    const processLine = (line: string) => {
-      if (firstLine) {
-        if (line === expectedHeaderMore) {
-          variant = CsvVariant.More;
-        } else if (line === expectedHeaderBasic) {
-          variant = CsvVariant.Basic;
-        } else {
-          countryInfoMap = null;
-          rl.close();
-        }
-        firstLine = false;
-      }
+    const parser = fs.createReadStream(csvPath).pipe(csvParser());
 
-      if (!countryInfoMap) {
-        return;
-      }
+    const countryInfoMap: CountryInfoMap = {};
+    let firstRecord = true;
 
-      if (variant === CsvVariant.Basic) {
-        const match = expectedLineBasicRe.exec(line);
-        if (match) {
-          countryInfoMap[match[1]] = {
-            capital: normalizeStr(match[2]),
-            total_area: normalizeNum(match[3]),
-          };
-        }
-      } else if (variant === CsvVariant.More) {
-        const match = expectedLineMoreRe.exec(line);
-        if (match) {
-          countryInfoMap[match[1]] = {
-            country_name: normalizeStr(match[2]),
-            country_alpha3_code: normalizeStr(match[3]),
-            country_numeric_code: normalizeNum(match[4]),
-            capital: normalizeStr(match[5]),
-            country_demonym: normalizeStr(match[6]),
-            total_area: normalizeNum(match[7]),
-            population: normalizeNum(match[8]),
-            idd_code: normalizeNum(match[9]),
-            currency_code: normalizeStr(match[10]),
-            currency_name: normalizeStr(match[11]),
-            currency_symbol: normalizeStr(match[12]),
-            lang_code: normalizeStr(match[13]),
-            lang_name: normalizeStr(match[14]),
-            cctld: normalizeStr(match[15]),
-          };
-        }
-      } else {
-        countryInfoMap = null;
-      }
-    };
+    for await (const record of parser) {
+      const countryInputData = record as {[key: string]: string};
 
-    return new Promise((resolve) => {
-      rl.on('line', processLine).on('close', () => {
-        if (countryInfoMap !== null) {
-          this.countryInfoMap_ = countryInfoMap;
-        }
-        resolve();
-      });
-    });
+      if (
+        firstRecord &&
+        Object.keys(countryInputData).filter((key) =>
+          ['country_code', 'capital', 'total_area'].includes(key)
+        ).length !== 3
+      ) {
+        throw new Error('Country info database does not have expected headings');
+      }
+      firstRecord = false;
+
+      const countryOutputData: CountryInfoData = {
+        country_code: null,
+        capital: null,
+        total_area: null,
+      };
+
+      for (const key in countryInputData) {
+        countryOutputData[key] = [
+          'country_numeric_code',
+          'total_area',
+          'population',
+          'idd_code',
+        ].includes(key)
+          ? normalizeNum(countryInputData[key])
+          : normalizeStr(countryInputData[key]);
+      }
+      if (countryOutputData.country_code) {
+        countryInfoMap[countryOutputData.country_code] = countryOutputData;
+      }
+    }
+
+    this.countryInfoMap_ = Object.keys(countryInfoMap).length ? countryInfoMap : null;
   }
 
   /**
