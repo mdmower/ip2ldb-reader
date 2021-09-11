@@ -115,6 +115,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
   let subdivisionFilename: string | undefined;
   let geoNameIdFilename: string | undefined;
   let countryInfoFilename: string | undefined;
+  let iataIcaoFilename: string | undefined;
   if (csvSelection.length) {
     console.log('\nAvailable CSV databases:\n' + csvSelection.join('\n') + '\n');
     const selectedSubdivision = await new Promise<string>((resolve) => {
@@ -146,16 +147,25 @@ const loopTest = (ip2Location: Ip2lReader) => {
     } else if (selectedCountryInfo) {
       console.log('Invalid country info selection');
     }
+
+    const selectedIataIcao = await new Promise<string>((resolve) => {
+      rl.question('Select an IATA/ICAO airports database by number (optional): ', resolve);
+    });
+
+    if (/^\d+$/.test(selectedIataIcao)) {
+      iataIcaoFilename = csvFiles[parseInt(selectedIataIcao) - 1]?.name;
+    } else if (selectedIataIcao) {
+      console.log('Invalid IATA/ICAO airports selection');
+    }
   }
 
   console.log('\nLoading database(s):');
   console.log(`  ${databaseFilename}`);
-  if (subdivisionFilename) {
-    console.log(`  ${subdivisionFilename}`);
-  }
-  if (geoNameIdFilename) {
-    console.log(`  ${geoNameIdFilename}`);
-  }
+  [subdivisionFilename, geoNameIdFilename, countryInfoFilename, iataIcaoFilename]
+    .filter(Boolean)
+    .forEach((filename) => {
+      console.log(`  ${filename || ''}`);
+    });
   process.stdout.write('  ... ');
 
   let ip2Location: Ip2lReader;
@@ -167,6 +177,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
       subdivisionCsvPath: subdivisionFilename ? './database/' + subdivisionFilename : undefined,
       geoNameIdCsvPath: geoNameIdFilename ? './database/' + geoNameIdFilename : undefined,
       countryInfoCsvPath: countryInfoFilename ? './database/' + countryInfoFilename : undefined,
+      iataIcaoCsvPath: iataIcaoFilename ? './database/' + iataIcaoFilename : undefined,
     });
     // ip2Location.close();
     // await ip2Location.init('./database/' + databaseFilename, {

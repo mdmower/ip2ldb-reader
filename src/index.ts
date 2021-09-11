@@ -3,12 +3,14 @@ import {Ip2lOptions, Ip2lData} from './interfaces';
 import {SubdivReader} from './subdiv-reader';
 import {GeoNameIdReader} from './geonameid-reader';
 import {CountryInfoReader} from './country-info-reader';
+import {IataIcaoReader} from './iata-icao-reader';
 
 export default class Ip2lReader {
   private dbReader_: DbReader;
   private subdivReader_?: SubdivReader;
   private geoNameIdReader_?: GeoNameIdReader;
   private countryInfoReader_?: CountryInfoReader;
+  private iataIcaoReader_?: IataIcaoReader;
 
   constructor() {
     this.dbReader_ = new DbReader();
@@ -42,6 +44,11 @@ export default class Ip2lReader {
     if (options.countryInfoCsvPath) {
       this.countryInfoReader_ = new CountryInfoReader();
       await this.countryInfoReader_.init(options.countryInfoCsvPath, options.reloadOnDbUpdate);
+    }
+
+    if (options.iataIcaoCsvPath) {
+      this.iataIcaoReader_ = new IataIcaoReader();
+      await this.iataIcaoReader_.init(options.iataIcaoCsvPath, options.reloadOnDbUpdate);
     }
   }
 
@@ -88,6 +95,14 @@ export default class Ip2lReader {
       }
     }
 
+    // IATA/ICAO airport info support is optional
+    if (this.iataIcaoReader_) {
+      if (typeof ip2lData.country_short === 'string' && typeof ip2lData.region === 'string') {
+        const airports = this.iataIcaoReader_.get(ip2lData.country_short, ip2lData.region);
+        ip2lData.airports = airports;
+      }
+    }
+
     return ip2lData;
   }
 
@@ -99,6 +114,7 @@ export default class Ip2lReader {
     this.subdivReader_?.close();
     this.geoNameIdReader_?.close();
     this.countryInfoReader_?.close();
+    this.iataIcaoReader_?.close();
   }
 }
 

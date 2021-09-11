@@ -23,6 +23,11 @@ export interface Ip2lOptions {
    * Path to IP2Location Country Info CSV database (default: undefined)
    */
   countryInfoCsvPath?: string;
+
+  /**
+   * Path to IATA/ICAO airport CSV database (default: undefined)
+   */
+  iataIcaoCsvPath?: string;
 }
 
 export interface CountryInfoData {
@@ -104,8 +109,37 @@ export interface CountryInfoData {
   cctld?: string | null;
 }
 
+export interface IataIcaoData {
+  [key: string]: string | number | null;
+
+  /**
+   * Three-character code of IATA airport code
+   */
+  iata: string | null;
+
+  /**
+   * Four-character code of ICAO airport code
+   */
+  icao: string | null;
+
+  /**
+   * Airport name
+   */
+  airport: string | null;
+
+  /**
+   * Latitude of the airport
+   */
+  latitude: number | null;
+
+  /**
+   * Longitude of the airport
+   */
+  longitude: number | null;
+}
+
 export interface Ip2lData {
-  [key: string]: string | number | CountryInfoData | null | undefined;
+  [key: string]: string | number | CountryInfoData | IataIcaoData[] | null | undefined;
 
   /**
    * IP address
@@ -246,4 +280,9 @@ export interface Ip2lData {
    * GeoName ID
    */
   geoname_id?: number;
+
+  /**
+   * IATA/ICAO airport info
+   */
+  airports?: IataIcaoData[];
 }

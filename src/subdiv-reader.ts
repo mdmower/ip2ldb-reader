@@ -90,7 +90,7 @@ class SubdivReader {
 
   /**
    * Initialize reader
-   * @param dbPath IP2Location BIN database
+   * @param dbPath IP2Location CSV database
    * @param reloadOnDbUpdate Options for database reader
    */
   public async init(dbPath: string, reloadOnDbUpdate?: boolean): Promise<void> {

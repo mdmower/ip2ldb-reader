@@ -1,9 +1,9 @@
 import fs, {FSWatcher} from 'fs';
 import csvParser from 'csv-parser';
-import {CountryInfoData} from './interfaces';
+import {IataIcaoData} from './interfaces';
 
-interface CountryInfoMap {
-  [key: string]: CountryInfoData | undefined;
+interface IataIcaoMap {
+  [key: string]: {[key: string]: IataIcaoData[] | undefined} | undefined;
 }
 
 enum ReaderStatus {
@@ -12,26 +12,26 @@ enum ReaderStatus {
   Ready,
 }
 
-class CountryInfoReader {
+class IataIcaoReader {
   private readerStatus_: ReaderStatus;
   private dbPath_: string | null;
   private fsWatcher_: FSWatcher | null;
   private reloadPromise_: Promise<void>;
-  private countryInfoMap_: CountryInfoMap | null;
+  private iataIcaoMap_: IataIcaoMap | null;
 
   constructor() {
     this.readerStatus_ = ReaderStatus.NotInitialized;
     this.dbPath_ = null;
     this.fsWatcher_ = null;
     this.reloadPromise_ = Promise.resolve();
-    this.countryInfoMap_ = null;
+    this.iataIcaoMap_ = null;
   }
 
   /**
-   * Load IP2Location countryInfo map into memory
-   * @param csvPath Filesystem path to IP2Location CSV Country Info database
+   * Load IP2Location IATA/ICAO map into memory
+   * @param csvPath Filesystem path to IP2Location CSV IATA/ICAO database
    */
-  private async loadCountryInfoMap(csvPath: string): Promise<void> {
+  private async loadIataIcaoMap(csvPath: string): Promise<void> {
     const normalizeStr = (val: string): string => {
       return val.replace(/^-$/, '');
     };
@@ -44,44 +44,48 @@ class CountryInfoReader {
 
     const parser = fs.createReadStream(csvPath).pipe(csvParser());
 
-    const countryInfoMap: CountryInfoMap = {};
+    const iataIcaoMap: IataIcaoMap = {};
     let firstRecord = true;
 
     for await (const record of parser) {
-      const countryInputData = record as {[key: string]: string};
+      const airportInputData = record as {[key: string]: string};
 
       if (
         firstRecord &&
-        Object.keys(countryInputData).filter((key) =>
-          ['country_code', 'capital', 'total_area'].includes(key)
-        ).length !== 3
+        Object.keys(airportInputData).filter((key) =>
+          ['country_code', 'region_name', 'iata', 'icao', 'latitude', 'longitude'].includes(key)
+        ).length !== 6
       ) {
-        throw new Error('Country info database does not have expected headings');
+        throw new Error('IATA/ICAO database does not have expected headings');
       }
       firstRecord = false;
 
-      const countryOutputData: CountryInfoData = {
-        country_code: null,
-        capital: null,
-        total_area: null,
+      const airportOutputData: IataIcaoData = {
+        iata: null,
+        icao: null,
+        airport: null,
+        latitude: null,
+        longitude: null,
       };
 
-      for (const key in countryInputData) {
-        countryOutputData[key] = [
-          'country_numeric_code',
-          'total_area',
-          'population',
-          'idd_code',
-        ].includes(key)
-          ? normalizeNum(countryInputData[key])
-          : normalizeStr(countryInputData[key]);
+      const {country_code, region_name} = airportInputData;
+      for (const key in airportInputData) {
+        if (['country_code', 'region_name'].includes(key)) {
+          continue;
+        }
+        airportOutputData[key] = ['latitude', 'longitude'].includes(key)
+          ? normalizeNum(airportInputData[key])
+          : normalizeStr(airportInputData[key]);
       }
-      if (countryOutputData.country_code) {
-        countryInfoMap[countryOutputData.country_code] = countryOutputData;
-      }
+
+      const countryMap = iataIcaoMap[country_code] || {};
+      const regionArray = countryMap[region_name] || [];
+      regionArray.push(airportOutputData);
+      countryMap[region_name] = regionArray;
+      iataIcaoMap[country_code] = countryMap;
     }
 
-    this.countryInfoMap_ = Object.keys(countryInfoMap).length ? countryInfoMap : null;
+    this.iataIcaoMap_ = Object.keys(iataIcaoMap).length ? iataIcaoMap : null;
   }
 
   /**
@@ -110,7 +114,7 @@ class CountryInfoReader {
 
     this.dbPath_ = null;
     this.fsWatcher_ = null;
-    this.countryInfoMap_ = null;
+    this.iataIcaoMap_ = null;
   }
 
   /**
@@ -120,13 +124,13 @@ class CountryInfoReader {
    */
   public async init(dbPath: string, reloadOnDbUpdate?: boolean): Promise<void> {
     if (!dbPath) {
-      throw new Error('Must specify path to Country Info CSV database');
+      throw new Error('Must specify path to IATA/ICAO CSV database');
     }
 
     this.readerStatus_ = ReaderStatus.Initializing;
     this.dbPath_ = dbPath;
 
-    await this.loadCountryInfoMap(dbPath);
+    await this.loadIataIcaoMap(dbPath);
 
     if (reloadOnDbUpdate) {
       this.watchDbFile(dbPath);
@@ -154,7 +158,7 @@ class CountryInfoReader {
 
     this.fsWatcher_ = fs.watch(dbPath, (eventType, filename) => {
       // Use a 500ms debounce on database changes before init re-runs.
-      // Since countryInfoMap is cached in memory, there's no need to
+      // Since iataIcaoMap is cached in memory, there's no need to
       // change the reader status; it'll just update in-place.
       if (timeout !== null) {
         clearTimeout(timeout);
@@ -167,19 +171,20 @@ class CountryInfoReader {
   }
 
   /**
-   * Get country info from a country code
+   * Get IATA/ICAO airport info from country code and region name
    * @param country ISO 3166-1 country code from IP2Location database
+   * @param region Region from from IP2Location database
    */
-  public get(country: string): CountryInfoData | null {
-    if (this.readerStatus_ !== ReaderStatus.Ready || !this.countryInfoMap_) {
-      return null;
+  public get(country: string, region: string): IataIcaoData[] {
+    if (this.readerStatus_ !== ReaderStatus.Ready || !this.iataIcaoMap_) {
+      return [];
     }
-    if (!country) {
-      return null;
+    if (!country || !region) {
+      return [];
     }
 
-    return this.countryInfoMap_[country] || null;
+    return (this.iataIcaoMap_[country] || {})[region] || [];
   }
 }
 
-export {CountryInfoReader, ReaderStatus};
+export {IataIcaoReader, ReaderStatus};

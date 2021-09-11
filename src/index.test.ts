@@ -18,12 +18,16 @@ describe('Multiple DB readers', () => {
   // https://www.ip2location.com/free/country-information
   // to be decompressed and made available in /database folder within project directory.
   const countryInfoDbPath = 'database/IP2LOCATION-COUNTRY-INFORMATION.CSV';
+  // Requires CSV IATA/ICAO database from https://github.com/ip2location/ip2location-iata-icao
+  // to be made available in /database folder within project directory.
+  const iataIcaoDbPath = 'database/IP2LOCATION-IATA-ICAO.CSV';
 
   const conditionalDescribeMulti =
     fs.existsSync(db25Path) &&
     fs.existsSync(subdivDbPath) &&
     fs.existsSync(geonameidDbPath) &&
-    fs.existsSync(countryInfoDbPath)
+    fs.existsSync(countryInfoDbPath) &&
+    fs.existsSync(iataIcaoDbPath)
       ? describe
       : describe.skip;
 
@@ -36,6 +40,7 @@ describe('Multiple DB readers', () => {
         geoNameIdCsvPath: geonameidDbPath,
         subdivisionCsvPath: subdivDbPath,
         countryInfoCsvPath: countryInfoDbPath,
+        iataIcaoCsvPath: iataIcaoDbPath,
       });
     });
 
@@ -58,6 +63,7 @@ describe('Multiple DB readers', () => {
       };
 
       const {
+        airports,
         country_short,
         geoname_id,
         ip,
@@ -77,11 +83,13 @@ describe('Multiple DB readers', () => {
       expect(status).toEqual(expectedResultPartial.status);
       expect(subdivision).toEqual('CA');
       expect(country_info?.idd_code).toEqual(1);
+      expect(airports?.length).toBeGreaterThan(0);
     });
 
     it('Contains all possible keys', () => {
       const allPossibleKeys = [
         'addresstype',
+        'airports',
         'areacode',
         'category',
         'city',
@@ -128,13 +136,16 @@ describe('Multiple DB readers', () => {
         geoNameIdCsvPath: geonameidDbPath,
         subdivisionCsvPath: subdivDbPath,
         countryInfoCsvPath: countryInfoDbPath,
+        iataIcaoCsvPath: iataIcaoDbPath,
       });
-      const {status, country_short, geoname_id, subdivision, country_info} = dbReader.get(testIp);
+      const {status, country_short, geoname_id, subdivision, country_info, airports} =
+        dbReader.get(testIp);
       expect(status).toEqual('OK');
       expect(country_short).toEqual('US');
       expect(geoname_id).toEqual(5375481);
       expect(subdivision).toEqual('CA');
       expect(country_info?.idd_code).toEqual(1);
+      expect(airports?.length).toBeGreaterThan(0);
     });
   });
 });
