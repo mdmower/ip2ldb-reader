@@ -53,7 +53,7 @@ class GeoNameIdReader extends CsvReader {
     }
 
     const geoNameId = ((this.geoNameIdMap_[country] || {})[region] || {})[city];
-    return geoNameId != undefined ? geoNameId : 0;
+    return geoNameId != undefined ? geoNameId : null;
   }
 }
 

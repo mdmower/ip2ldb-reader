@@ -91,11 +91,11 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
   country_short?: string;
   domain?: string;
   elevation?: string;
-  geoname_id?: number;
+  geoname_id?: number | null;
   iddcode?: string;
   isp?: string;
-  latitude?: number;
-  longitude?: number;
+  latitude?: number | null;
+  longitude?: number | null;
   mcc?: string;
   mnc?: string;
   mobilebrand?: string;
@@ -169,11 +169,11 @@ Possible values for `status` include:
 When no geolocation data is available for a supported property in the return object:
 
 - String values are empty (`""`)
-- Number values are zero (`0`)
+- Number values are null (`null`)
 
-## Known issues
+## Upgrade notes
 
-IP2Location databases store `latitude = 0` and `longitude = 0` when no coordinates are known for an IP. Unfortunately, this is a real location: [Null Island](https://en.wikipedia.org/wiki/Null_Island). This reader cannot determine for certain whether the coordinates are real or not known, so no attempt is made at invalidating them in the return object.
+- Prior to version 2.0, unknown number values were reported as zero (`0`). Beginning with version 2.0, unknown numbers are reported as null (`null`);
 
 ## Development
 

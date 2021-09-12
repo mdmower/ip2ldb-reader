@@ -506,8 +506,8 @@ class DbReader {
               data['country_short'] = this.readString(countrypos) || '';
               data['country_long'] = this.readString(countrypos + 3) || '';
             } else if (key === 'longitude' || key === 'latitude') {
-              data[key] =
-                Math.round(this.readBufferFloat(this.offset_[key], buff) * 1000000) / 1000000;
+              const num = this.readBufferFloat(this.offset_[key], buff);
+              data[key] = num !== 0 ? Math.round(num * 1000000) / 1000000 : null;
             } else {
               data[key] = this.readString(this.readBufferInt32(this.offset_[key], buff)) || '';
             }

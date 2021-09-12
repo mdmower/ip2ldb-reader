@@ -194,12 +194,12 @@ export interface Ip2lData {
   /**
    * City latitude; defaults to capital city latitude if city is unknown
    */
-  latitude?: number;
+  latitude?: number | null;
 
   /**
    * City longitude; defaults to capital city longitude if city is unknown
    */
-  longitude?: number;
+  longitude?: number | null;
 
   /**
    * Internet domain name associated with IP address range
@@ -279,7 +279,7 @@ export interface Ip2lData {
   /**
    * GeoName ID
    */
-  geoname_id?: number;
+  geoname_id?: number | null;
 
   /**
    * IATA/ICAO airport info

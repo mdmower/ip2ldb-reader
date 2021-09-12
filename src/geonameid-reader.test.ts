@@ -24,7 +24,7 @@ describe('GeoName ID', () => {
     });
 
     it('Does not identify XX, Abcdef, Ghijkl GeoName ID', () => {
-      expect(geoNameIdReader.get('XX', 'Abcdef', 'Ghijkl')).toEqual(0);
+      expect(geoNameIdReader.get('XX', 'Abcdef', 'Ghijkl')).toEqual(null);
     });
   });
 });

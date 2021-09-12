@@ -41,8 +41,8 @@ describe('IP2Location DB reader', () => {
       expect(country_short).toEqual('');
       expect(ip).toEqual(testIp);
       expect(ip_no).toEqual(ipNum);
-      expect(latitude).toEqual(0);
-      expect(longitude).toEqual(0);
+      expect(latitude).toEqual(null);
+      expect(longitude).toEqual(null);
       expect(status).toEqual('OK');
     });
 
