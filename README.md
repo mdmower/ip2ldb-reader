@@ -4,7 +4,7 @@ A database reader for IP2Location [paid](https://www.ip2location.com/database), 
 
 ## Installation
 
-This module has been tested with Node.js 10, 12, and 14. Feel free to try other versions, but additional support is not promised.
+This module has been tested with Node.js 10, 12, 14, and 16. Feel free to try other versions, but additional support is not promised.
 
 Local installation
 
@@ -51,6 +51,12 @@ ip2lReader.close();
 
   // {string} Path to GeoName ID CSV database
   geoNameIdCsvPath: undefined,
+
+  // {string} Path to country info CSV database
+  countryInfoCsvPath: undefined,
+
+  // {string} Path to IATA/ICAO airport CSV database
+  iataIcaoCsvPath: undefined,
 }
 ```
 
@@ -62,6 +68,8 @@ ip2lReader.close();
   - If `cacheDatabaseInMemory` is `true`, the reader will continue to return results from the cached database while the updated database loads. There is no interruption in service.
 - `subdivisionCsvPath` - When a filesystem path to the [IP2Location ISO 3166-2 Subdivision Code CSV database](https://www.ip2location.com/free/iso3166-2) is provided, the country code and region will be used to identify the corresponding subdivision code.
 - `geoNameIdCsvPath` - When a filesystem path to the [IP2Location GeoName ID CSV database](https://www.ip2location.com/free/geoname-id) is provided, the country code, region, and city will be used to identify the corresponding GeoName ID.
+- `countryInfoCsvPath` - When a filesystem path to the [IP2Location Country Information CSV database](https://www.ip2location.com/free/country-information) is provided, the country code will be used to identify additional country information (capital, population, currency, language, etc.).
+- `iataIcaoCsvPath` - When a filesystem path to the [IP2Location IATA/ICAO airport CSV database](https://github.com/ip2location/ip2location-iata-icao) is provided, the country code and region will be used to identify airports in the region.
 
 ## Return
 
@@ -74,9 +82,11 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
   status: string | null;
 
   addresstype?: string;
+  airports?: IataIcaoData[] | null;
   areacode?: string;
   category?: string;
   city?: string;
+  country_info?: CountryInfoData | null;
   country_long?: string;
   country_short?: string;
   domain?: string;
@@ -98,6 +108,40 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
   weatherstationname?: string;
   zipcode?: string;
 }
+```
+
+where
+
+```JavaScript
+CountryInfoData: {
+    capital: string;
+    cctld?: string;
+    country_alpha3_code?: string;
+    country_code: string;
+    country_demonym?: string;
+    country_name?: string;
+    country_numeric_code?: number | null;
+    currency_code?: string;
+    currency_name?: string;
+    currency_symbol?: string;
+    idd_code?: number | null;
+    lang_code?: string;
+    lang_name?: string;
+    population?: number | null;
+    total_area: number | null;
+  },
+```
+
+and
+
+```JavaScript
+IataIcaoData: {
+    airport: string;
+    iata: string;
+    icao: string;
+    latitude: number | null;
+    longitude: number | null;
+  },
 ```
 
 Properties suffixed by `?` only exist if the database supports them. For example, when using a DB1 (country only) database, a sample return object looks like
@@ -139,6 +183,8 @@ Unit tests require the following database files to be made available in folder `
 
 - [IP2LOCATION-ISO3166-2.CSV](https://www.ip2location.com/free/iso3166-2) - ISO 3166-2 Subdivision Code database in CSV format
 - [IP2LOCATION-GEONAMEID.CSV](https://www.ip2location.com/free/geoname-id) - GeoName ID database in CSV format
+- [IP2LOCATION-COUNTRY-INFORMATION.CSV](https://www.ip2location.com/free/country-information) - Country Info ("More Information" version) database in CSV format
+- [IP2LOCATION-IATA-ICAO.CSV](https://github.com/ip2location/ip2location-iata-icao) - IATA/ICAO airport database in CSV format
 - [IP2LOCATION-LITE-DB1.BIN](https://lite.ip2location.com/database/db1-ip-country) - LITE IP-COUNTRY DB1 IPv4 database in BIN format
 - [IP2LOCATION-SAMPLE-DB25.IPV6.BIN](https://www.ip2location.com/database/db25-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category) - Sample DB25 IPv6 database in BIN format
 

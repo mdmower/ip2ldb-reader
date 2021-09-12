@@ -2,7 +2,7 @@ import {CountryInfoReader} from './country-info-reader';
 import fs from 'fs';
 import {CountryInfoData} from './interfaces';
 
-// Requires "more information" CSV subdivision database from
+// Requires "more information" country info CSV database from
 // https://www.ip2location.com/free/country-information
 // to be decompressed and made available in /database folder within project directory.
 const countryInfoDbPath = 'database/IP2LOCATION-COUNTRY-INFORMATION.CSV';
