@@ -106,6 +106,3 @@ dist
 # Custom
 lib/
 .vscode/
-database/
-*.[Bb][Ii][Nn]
-*.[Cc][Ss][Vv]

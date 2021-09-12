@@ -1,5 +1,5 @@
-import {CountryInfoReader, ReaderStatus} from './country-info-reader';
-import fs, {FSWatcher} from 'fs';
+import {CountryInfoReader} from './country-info-reader';
+import fs from 'fs';
 import {CountryInfoData} from './interfaces';
 
 // Requires "more information" CSV subdivision database from
@@ -44,64 +44,6 @@ describe('Country info', () => {
 
     it('Does not identify XX country info', () => {
       expect(countryInfoReader.get('XX')).toEqual(null);
-    });
-  });
-
-  conditionalDescribe('DB watch', () => {
-    let countryInfoReader: CountryInfoReader;
-    let initSpy: jest.SpyInstance;
-    let watchSpy: jest.SpyInstance;
-    let watchCallbackCount: number;
-
-    beforeAll(() => {
-      jest.useFakeTimers();
-    });
-
-    beforeEach(() => {
-      watchCallbackCount = 0;
-      watchSpy = jest.spyOn(fs, 'watch').mockImplementation((filename, callback): FSWatcher => {
-        const runCallbackAndIncrementCount = () => {
-          callback && callback('change', filename.toString());
-          watchCallbackCount += 1;
-        };
-        const timeouts = [
-          setTimeout(runCallbackAndIncrementCount, 50),
-          setTimeout(runCallbackAndIncrementCount, 100),
-          setTimeout(runCallbackAndIncrementCount, 150),
-        ];
-        return {
-          close: () => timeouts.forEach(clearTimeout),
-        } as FSWatcher;
-      });
-
-      countryInfoReader = new CountryInfoReader();
-
-      initSpy = jest.spyOn(countryInfoReader, 'init');
-    });
-
-    afterEach(() => {
-      countryInfoReader.close();
-      jest.restoreAllMocks();
-    });
-
-    afterAll(() => {
-      jest.clearAllTimers();
-      jest.useRealTimers();
-    });
-
-    it('Reloads database once', async () => {
-      await countryInfoReader.init(countryInfoDbPath, true);
-      expect(countryInfoReader.readerStatus).toEqual(ReaderStatus.Ready);
-      jest.advanceTimersByTime(200);
-      expect(watchCallbackCount).toEqual(3);
-      jest.advanceTimersByTime(300);
-      jest.runOnlyPendingTimers();
-      expect(countryInfoReader.readerStatus).toEqual(ReaderStatus.Initializing);
-      await countryInfoReader.reloadPromise;
-      expect(countryInfoReader.readerStatus).toEqual(ReaderStatus.Ready);
-      expect(watchSpy).toHaveBeenCalledTimes(2);
-      expect(initSpy).toHaveBeenCalledTimes(2);
-      expect(countryInfoReader.get('US')?.country_name).toEqual('United States of America');
     });
   });
 });
