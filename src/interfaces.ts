@@ -36,17 +36,17 @@ export interface CountryInfoData {
   /**
    * Two-character country code based on ISO 3166
    */
-  country_code: string | null;
+  country_code: string;
 
   /**
    * Country name based on ISO 3166
    */
-  country_name?: string | null;
+  country_name?: string;
 
   /**
    * Three-character country code based on ISO 3166
    */
-  country_alpha3_code?: string | null;
+  country_alpha3_code?: string;
 
   /**
    * Three-character country numeric code based on ISO 3166
@@ -56,12 +56,12 @@ export interface CountryInfoData {
   /**
    * Capital of the country
    */
-  capital: string | null;
+  capital: string;
 
   /**
    * Demonym of the country
    */
-  country_demonym?: string | null;
+  country_demonym?: string;
 
   /**
    * Total area in square-km
@@ -81,51 +81,51 @@ export interface CountryInfoData {
   /**
    * Currency code based on ISO 4217
    */
-  currency_code?: string | null;
+  currency_code?: string;
 
   /**
    * Currency name
    */
-  currency_name?: string | null;
+  currency_name?: string;
 
   /**
    * Currency symbol
    */
-  currency_symbol?: string | null;
+  currency_symbol?: string;
 
   /**
    * Language code based on ISO 639
    */
-  lang_code?: string | null;
+  lang_code?: string;
 
   /**
    * Language name
    */
-  lang_name?: string | null;
+  lang_name?: string;
 
   /**
    * Country-Code Top-Level Domain
    */
-  cctld?: string | null;
+  cctld?: string;
 }
 
 export interface IataIcaoData {
-  [key: string]: string | number | null;
+  [key: string]: string | number | null | undefined;
 
   /**
    * Three-character code of IATA airport code
    */
-  iata: string | null;
+  iata: string;
 
   /**
    * Four-character code of ICAO airport code
    */
-  icao: string | null;
+  icao: string;
 
   /**
    * Airport name
    */
-  airport: string | null;
+  airport: string;
 
   /**
    * Latitude of the airport

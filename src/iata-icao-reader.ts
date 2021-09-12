@@ -37,9 +37,9 @@ class IataIcaoReader extends CsvReader {
     };
 
     const airportOutputData: IataIcaoData = {
-      iata: null,
-      icao: null,
-      airport: null,
+      iata: '',
+      icao: '',
+      airport: '',
       latitude: null,
       longitude: null,
     };

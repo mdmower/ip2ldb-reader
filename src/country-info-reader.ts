@@ -30,8 +30,8 @@ class CountryInfoReader extends CsvReader {
     };
 
     const countryInfoData: CountryInfoData = {
-      country_code: null,
-      capital: null,
+      country_code: '',
+      capital: '',
       total_area: null,
     };
 
