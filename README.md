@@ -1,5 +1,8 @@
 # ip2ldb-reader
 
+![npm](https://img.shields.io/npm/v/ip2ldb-reader)
+![NPM](https://img.shields.io/npm/l/ip2ldb-reader)
+
 A database reader for IP2Location [paid](https://www.ip2location.com/database), [free](https://lite.ip2location.com/database), and [sample](https://www.ip2location.com/development-libraries) databases. This is derivative work, based on [github.com/ip2location-nodejs/IP2Location](https://github.com/ip2location-nodejs/IP2Location).
 
 ## Installation
