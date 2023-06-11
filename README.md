@@ -78,7 +78,7 @@ ip2lReader.close();
 
 The object returned by `Ip2lReader.get(ip)` has the following structure:
 
-```JavaScript
+```TypeScript
 {
   ip: string | null;
   ip_no: string | null;
@@ -87,11 +87,14 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
   addresstype?: string;
   airports?: IataIcaoData[] | null;
   areacode?: string;
+  as?: string;
+  asn?: string;
   category?: string;
   city?: string;
   country_info?: CountryInfoData | null;
   country_long?: string;
   country_short?: string;
+  district?: string;
   domain?: string;
   elevation?: string;
   geoname_id?: number | null;
@@ -115,8 +118,8 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
 
 where
 
-```JavaScript
-CountryInfoData: {
+```TypeScript
+CountryInfoData = {
     capital: string;
     cctld?: string;
     country_alpha3_code?: string;
@@ -137,8 +140,8 @@ CountryInfoData: {
 
 and
 
-```JavaScript
-IataIcaoData: {
+```TypeScript
+IataIcaoData = {
     airport: string;
     iata: string;
     icao: string;
@@ -189,6 +192,6 @@ Unit tests require the following database files to be made available in folder `
 - [IP2LOCATION-COUNTRY-INFORMATION.CSV](https://www.ip2location.com/free/country-information) - Country Info ("More Information" version) database in CSV format
 - [IP2LOCATION-IATA-ICAO.CSV](https://github.com/ip2location/ip2location-iata-icao) - IATA/ICAO airport database in CSV format
 - [IP2LOCATION-LITE-DB1.BIN](https://lite.ip2location.com/database/db1-ip-country) - LITE IP-COUNTRY DB1 IPv4 database in BIN format
-- [IP2LOCATION-SAMPLE-DB25.IPV6.BIN](https://www.ip2location.com/database/db25-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category) - Sample DB25 IPv6 database in BIN format
+- [IP2LOCATION-SAMPLE-DB26.IPV6.BIN](https://www.ip2location.com/database/db26-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category-district-asn) - Sample DB26 IPv6 database in BIN format
 
-Note that the _sample_ DB25 database is expected for unit tests, not the full, paid database.
+Note that the _sample_ DB26 database is expected for unit tests, not the full, paid database.
