@@ -421,6 +421,10 @@ class DbReader {
       }
 
       return fs.watch(this.dbPath_, (eventType, filename) => {
+        if (!filename) {
+          return;
+        }
+
         // Use a 500ms debounce on database changes before database reloads.
         // If we are reading from a database on disk (the default case), we
         // need to flag the reader as initializing right away to avoid

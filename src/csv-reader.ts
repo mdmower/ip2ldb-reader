@@ -117,6 +117,10 @@ abstract class CsvReader {
     };
 
     this.fsWatcher_ = fs.watch(dbPath, (eventType, filename) => {
+      if (!filename) {
+        return;
+      }
+
       // Use a 500ms debounce on database changes before init re-runs.
       // Since subdivisions are cached in memory, there's no need to
       // change the reader status; they'll just update in-place.
