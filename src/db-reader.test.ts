@@ -3,21 +3,21 @@ import {parseIp} from './ip-utils';
 import fs, {FSWatcher} from 'fs';
 
 describe('IP2Location DB reader', () => {
-  // Requires sample BIN IPV6 DB25 database from
-  // https://www.ip2location.com/database/db25-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category
-  // to be decompressed, renamed to IP2LOCATION-SAMPLE-DB25.IPV6.BIN,
+  // Requires sample BIN IPV6 DB26 database from
+  // https://www.ip2location.com/database/db26-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category-district-asn
+  // to be decompressed, renamed to IP2LOCATION-SAMPLE-DB26.IPV6.BIN,
   // and made available in /database folder within project directory.
   // Note: full, paid database will not work; we're looking for string
-  // "This is demo DB25 BIN database." to be returned.
-  const db25Path = 'database/IP2LOCATION-SAMPLE-DB25.IPV6.BIN';
-  const conditionalDescribe25 = fs.existsSync(db25Path) ? describe : describe.skip;
+  // "This is demo DB26 BIN database." to be returned.
+  const db26Path = 'database/IP2LOCATION-SAMPLE-DB26.IPV6.BIN';
+  const conditionalDescribe25 = fs.existsSync(db26Path) ? describe : describe.skip;
 
-  conditionalDescribe25('Identify with Sample IPv6 DB25', () => {
+  conditionalDescribe25('Identify with Sample IPv6 DB26', () => {
     let dbReader: DbReader;
 
     beforeAll(() => {
       dbReader = new DbReader();
-      dbReader.init(db25Path);
+      dbReader.init(db26Path);
     });
 
     afterAll(() => {
@@ -34,7 +34,7 @@ describe('IP2Location DB reader', () => {
       });
 
       for (const demoKey of demoKeys) {
-        expect(dbResult[demoKey]).toMatch(/^This is demo DB25 BIN database\./);
+        expect(dbResult[demoKey]).toMatch(/^This is IP2Location DB26 IPv6 sample BIN database\./);
       }
 
       const {country_short, ip, ip_no, latitude, longitude, status} = dbResult;
@@ -69,14 +69,17 @@ describe('IP2Location DB reader', () => {
       expect(status).toEqual(expectedResultPartial.status);
     });
 
-    it('Contains all DB25 keys', () => {
-      const allDb25Keys = [
+    it('Contains all DB26 keys', () => {
+      const allDb26Keys = [
         'addresstype',
         'areacode',
+        'as',
+        'asn',
         'category',
         'city',
         'country_long',
         'country_short',
+        'district',
         'domain',
         'elevation',
         'iddcode',
@@ -100,7 +103,7 @@ describe('IP2Location DB reader', () => {
 
       const testIp = '2001:4860:4860::8888';
       const dbResult = dbReader.get(testIp);
-      expect(Object.keys(dbResult).sort()).toEqual(allDb25Keys);
+      expect(Object.keys(dbResult).sort()).toEqual(allDb26Keys);
     });
 
     it('Does not identify invalid IPv6 address', () => {
