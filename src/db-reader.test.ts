@@ -297,6 +297,7 @@ describe('IP2Location DB reader', () => {
       dbReader = new DbReader();
 
       initSpy = jest.spyOn(dbReader, 'init');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       loadDatabaseSpy = jest.spyOn(DbReader.prototype as any, 'loadDatabase');
     });
 
