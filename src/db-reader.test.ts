@@ -10,9 +10,9 @@ describe('IP2Location DB reader', () => {
   // Note: full, paid database will not work; we're looking for string
   // "This is demo DB26 BIN database." to be returned.
   const db26Path = 'database/IP2LOCATION-SAMPLE-DB26.IPV6.BIN';
-  const conditionalDescribe25 = fs.existsSync(db26Path) ? describe : describe.skip;
+  const conditionalDescribe26 = fs.existsSync(db26Path) ? describe : describe.skip;
 
-  conditionalDescribe25('Identify with Sample IPv6 DB26', () => {
+  conditionalDescribe26('Identify with Sample IPv6 DB26', () => {
     let dbReader: DbReader;
 
     beforeAll(() => {

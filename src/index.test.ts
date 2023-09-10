@@ -3,11 +3,11 @@ import {parseIp} from './ip-utils';
 import fs from 'fs';
 
 describe('Multiple DB readers', () => {
-  // Requires sample BIN IPV6 DB25 database from
-  // https://www.ip2location.com/database/db25-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category
-  // to be decompressed, renamed to IP2LOCATION-SAMPLE-DB25.IPV6.BIN,
+  // Requires sample BIN IPV6 DB26 database from
+  // https://www.ip2location.com/database/db26-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category-district-asnhttps://www.ip2location.com/database/db26-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category-district-asn
+  // to be decompressed, renamed to IP2LOCATION-SAMPLE-DB26.IPV6.BIN,
   // and made available in /database folder within project directory.
-  const db25Path = 'database/IP2LOCATION-SAMPLE-DB25.IPV6.BIN';
+  const db26Path = 'database/IP2LOCATION-SAMPLE-DB26.IPV6.BIN';
   // Requires CSV subdivision database from https://www.ip2location.com/free/geoname-id
   // to be decompressed and made available in /database folder within project directory.
   const geonameidDbPath = 'database/IP2LOCATION-GEONAMEID.CSV';
@@ -23,7 +23,7 @@ describe('Multiple DB readers', () => {
   const iataIcaoDbPath = 'database/IP2LOCATION-IATA-ICAO.CSV';
 
   const conditionalDescribeMulti =
-    fs.existsSync(db25Path) &&
+    fs.existsSync(db26Path) &&
     fs.existsSync(subdivDbPath) &&
     fs.existsSync(geonameidDbPath) &&
     fs.existsSync(countryInfoDbPath) &&
@@ -36,7 +36,7 @@ describe('Multiple DB readers', () => {
 
     beforeAll(async () => {
       dbReader = new Ip2lReader();
-      await dbReader.init(db25Path, {
+      await dbReader.init(db26Path, {
         geoNameIdCsvPath: geonameidDbPath,
         subdivisionCsvPath: subdivDbPath,
         countryInfoCsvPath: countryInfoDbPath,
@@ -91,11 +91,14 @@ describe('Multiple DB readers', () => {
         'addresstype',
         'airports',
         'areacode',
+        'as',
+        'asn',
         'category',
         'city',
         'country_info',
         'country_long',
         'country_short',
+        'district',
         'domain',
         'elevation',
         'geoname_id',
@@ -132,7 +135,7 @@ describe('Multiple DB readers', () => {
         ip_no: '',
         status: 'NOT_INITIALIZED',
       });
-      await dbReader.init(db25Path, {
+      await dbReader.init(db26Path, {
         geoNameIdCsvPath: geonameidDbPath,
         subdivisionCsvPath: subdivDbPath,
         countryInfoCsvPath: countryInfoDbPath,

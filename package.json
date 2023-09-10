@@ -1,6 +1,6 @@
 {
   "name": "ip2ldb-reader",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Reader for IP2Location databases",
   "main": "lib/index.js",
   "scripts": {

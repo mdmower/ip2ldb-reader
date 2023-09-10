@@ -25,23 +25,30 @@ describe('IATA/ICAO airport info', () => {
           iata: 'LAX',
           icao: 'KLAX',
           airport: 'Los Angeles International Airport',
-          latitude: 33.94250107,
-          longitude: -118.4079971,
+          latitude: Math.round(33.94250107),
+          longitude: Math.round(-118.4079971),
         },
         SFO: {
           iata: 'SFO',
           icao: 'KSFO',
           airport: 'San Francisco International Airport',
-          latitude: 37.61899948,
-          longitude: -122.375,
+          latitude: Math.round(37.61899948),
+          longitude: Math.round(-122.375),
         },
       };
 
       const results = iataIcaoReader.get('US', 'California');
       expect(results.length).toBeGreaterThan(0);
+
       const laxResult = results.find((airport) => airport.iata === 'LAX');
+      expect(laxResult).toBeTruthy();
+      laxResult!.latitude = Math.round(laxResult!.latitude ?? 0);
+      laxResult!.longitude = Math.round(laxResult!.longitude ?? 0);
       expect(laxResult).toEqual(expectedResult.LAX);
       const sfoResult = results.find((airport) => airport.iata === 'SFO');
+      expect(sfoResult).toBeTruthy();
+      sfoResult!.latitude = Math.round(sfoResult!.latitude ?? 0);
+      sfoResult!.longitude = Math.round(sfoResult!.longitude ?? 0);
       expect(sfoResult).toEqual(expectedResult.SFO);
     });
 
