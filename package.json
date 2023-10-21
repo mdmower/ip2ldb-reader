@@ -4,19 +4,19 @@
   "description": "Reader for IP2Location databases",
   "main": "lib/index.js",
   "scripts": {
-    "lint": "eslint src",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "build": "npm run lint && npm run clean && npm run compile",
+    "build-release": "npm run lint && npm run clean && npm run compile-release",
     "clean": "rimraf lib",
+    "cli-testing": "node lib/cli-testing.js",
     "compile": "tsc --build tsconfig.json",
     "compile-release": "tsc --build tsconfig.release.json",
-    "build": "npm run lint && npm run compile",
-    "build-release": "npm run lint && npm run compile-release",
-    "prepublishOnly": "npm run clean && npm run build-release",
-    "test": "jest",
-    "cli-testing": "node lib/cli-testing.js"
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint src",
+    "prepare": "npm run clean && npm run compile-release",
+    "test": "jest"
   },
   "files": [
-    "lib/**/*"
+    "/lib"
   ],
   "repository": {
     "type": "git",

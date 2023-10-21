@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "sourceMap": true
+  },
   "include": ["src/**/*"],
   "extends": "./tsconfig.release.json",
   "exclude": ["node_modules"]
