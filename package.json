@@ -14,7 +14,7 @@
     "cli-test": "node lib/cli.js",
     "compile": "tsup",
     "compile:debug": "tsup --env.dev true",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "prettier --write .",
     "lint": "eslint src",
     "prepare": "npm run compile",
     "test": "jest"
