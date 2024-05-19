@@ -1,5 +1,5 @@
-import {CsvReader, ReaderStatus} from './csv-reader';
-import {CountryInfoData} from './interfaces';
+import {CsvReader, ReaderStatus} from './csv-reader.js';
+import {CountryInfoData} from './interfaces.js';
 
 interface CountryInfoMap {
   [key: string]: CountryInfoData | undefined;

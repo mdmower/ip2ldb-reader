@@ -1,6 +1,6 @@
-import Ip2lReader from './index';
-import fs from 'fs';
-import readline from 'readline';
+import fs from 'node:fs';
+import readline from 'node:readline';
+import Ip2lReader from './index.js';
 
 const fsp = fs.promises;
 

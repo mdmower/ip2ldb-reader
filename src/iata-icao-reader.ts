@@ -1,5 +1,5 @@
-import {CsvReader, ReaderStatus} from './csv-reader';
-import {IataIcaoData} from './interfaces';
+import {CsvReader, ReaderStatus} from './csv-reader.js';
+import {IataIcaoData} from './interfaces.js';
 
 interface IataIcaoMap {
   [key: string]: {[key: string]: IataIcaoData[] | undefined} | undefined;

@@ -1,4 +1,4 @@
-import net from 'net';
+import net from 'node:net';
 
 const FROM_6TO4 = BigInt('42545680458834377588178886921629466624');
 const TO_6TO4 = BigInt('42550872755692912415807417417958686719');

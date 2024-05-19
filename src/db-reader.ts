@@ -1,6 +1,6 @@
-import {parseIp} from './ip-utils';
-import fs, {FSWatcher} from 'fs';
-import {Ip2lData, Ip2lOptions} from './interfaces';
+import fs, {FSWatcher} from 'node:fs';
+import {parseIp} from './ip-utils.js';
+import {Ip2lData, Ip2lOptions} from './interfaces.js';
 
 // prettier-ignore
 const Position: {
@@ -234,7 +234,9 @@ class DbReader {
     if (this.fd_ !== null) {
       try {
         fs.closeSync(this.fd_);
-      } catch (ex) {}
+      } catch (ex) {
+        // do nothing
+      }
     }
 
     if (this.cacheInMemory_) {
@@ -329,7 +331,9 @@ class DbReader {
     if (this.fd_ !== null) {
       try {
         fs.closeSync(this.fd_);
-      } catch (ex) {}
+      } catch (ex) {
+        // do nothing
+      }
     }
 
     if (this.fsWatcher_ !== null) {

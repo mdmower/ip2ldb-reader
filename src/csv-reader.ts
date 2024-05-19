@@ -1,4 +1,4 @@
-import fs, {FSWatcher} from 'fs';
+import fs, {FSWatcher} from 'node:fs';
 import csvParser from 'csv-parser';
 
 enum ReaderStatus {

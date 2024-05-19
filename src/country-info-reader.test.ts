@@ -1,6 +1,6 @@
-import {CountryInfoReader} from './country-info-reader';
-import fs from 'fs';
-import {CountryInfoData} from './interfaces';
+import fs from 'node:fs';
+import {CountryInfoReader} from './country-info-reader.js';
+import {CountryInfoData} from './interfaces.js';
 
 // Requires "more information" country info CSV database from
 // https://www.ip2location.com/free/country-information

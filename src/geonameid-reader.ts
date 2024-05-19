@@ -1,4 +1,4 @@
-import {CsvReader, ReaderStatus} from './csv-reader';
+import {CsvReader, ReaderStatus} from './csv-reader.js';
 
 interface GeoNameIdMap {
   [key: string]: {[key: string]: {[key: string]: number | undefined} | undefined} | undefined;

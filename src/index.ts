@@ -1,9 +1,9 @@
-import {DbReader} from './db-reader';
-import {Ip2lOptions, Ip2lData} from './interfaces';
-import {SubdivReader} from './subdiv-reader';
-import {GeoNameIdReader} from './geonameid-reader';
-import {CountryInfoReader} from './country-info-reader';
-import {IataIcaoReader} from './iata-icao-reader';
+import {DbReader} from './db-reader.js';
+import {Ip2lOptions, Ip2lData} from './interfaces.js';
+import {SubdivReader} from './subdiv-reader.js';
+import {GeoNameIdReader} from './geonameid-reader.js';
+import {CountryInfoReader} from './country-info-reader.js';
+import {IataIcaoReader} from './iata-icao-reader.js';
 
 export default class Ip2lReader {
   private dbReader_: DbReader;

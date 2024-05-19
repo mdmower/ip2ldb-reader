@@ -1,8 +1,13 @@
 {
   "compilerOptions": {
-    "sourceMap": true
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "lib"
   },
   "include": ["src/**/*"],
-  "extends": "./tsconfig.release.json",
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.test.ts", "src/cli.ts"]
 }

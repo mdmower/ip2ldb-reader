@@ -1,4 +1,4 @@
-import {ReaderStatus, CsvReader} from './csv-reader';
+import {ReaderStatus, CsvReader} from './csv-reader.js';
 
 interface SubdivisionMap {
   [key: string]: {[key: string]: string | undefined} | undefined;

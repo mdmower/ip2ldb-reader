@@ -7,7 +7,7 @@ A database reader for IP2Location [paid](https://www.ip2location.com/database), 
 
 ## Installation
 
-This module has been tested with Node.js LTS 14, 16, and 18. Feel free test other versions of Node.js and [let me know](https://github.com/mdmower/ip2ldb-reader/issues) if you encounter compatibility issues.
+The minimum supported version of Node.js is 18.19.0. ES Module and CommonJS exports are available; importing this module should be seamless in either system.
 
 Local installation
 
@@ -18,9 +18,10 @@ npm install ip2ldb-reader
 ## Usage
 
 ```JavaScript
+// Import as ES Module
 import Ip2lReader from 'ip2ldb-reader';
-// Or using require() syntax:
-// const Ip2lReader = require('ip2ldb-reader').Ip2lReader;
+// Or require as CommonJS
+// const {Ip2lReader} = require('ip2ldb-reader');
 
 // Define database reader options
 const options = {...};

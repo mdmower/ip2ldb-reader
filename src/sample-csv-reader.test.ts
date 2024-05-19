@@ -1,5 +1,5 @@
-import {SampleCsvReader, ReaderStatus} from './sample-csv-reader';
-import fs, {FSWatcher} from 'fs';
+import fs, {FSWatcher} from 'node:fs';
+import {SampleCsvReader, ReaderStatus} from './sample-csv-reader.js';
 
 // Requires sample CSV database in /database folder within project directory.
 const sampleCsvDbPath = 'database/SAMPLE-CSVTEST.CSV';

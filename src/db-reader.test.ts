@@ -1,6 +1,6 @@
-import {DbReader, ReaderStatus} from './db-reader';
-import {parseIp} from './ip-utils';
-import fs, {FSWatcher} from 'fs';
+import fs, {FSWatcher} from 'node:fs';
+import {DbReader, ReaderStatus} from './db-reader.js';
+import {parseIp} from './ip-utils.js';
 
 describe('IP2Location DB reader', () => {
   // Requires sample BIN IPV6 DB26 database from

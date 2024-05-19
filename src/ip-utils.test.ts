@@ -1,4 +1,4 @@
-import {parseIp} from './ip-utils';
+import {parseIp} from './ip-utils.js';
 
 describe('Parse IP', () => {
   it('identifies IPv4 address', () => {
