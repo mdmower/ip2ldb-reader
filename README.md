@@ -5,19 +5,21 @@
 
 A database reader for IP2Location [paid](https://www.ip2location.com/database), [free](https://lite.ip2location.com/database), and [sample](https://www.ip2location.com/development-libraries) databases. This is derivative work, based on [github.com/ip2location-nodejs/IP2Location](https://github.com/ip2location-nodejs/IP2Location).
 
+## Requirements
+
+- Minimum supported Node.js version: 18.19.0
+
 ## Installation
 
-The minimum supported version of Node.js is 18.19.0. ES Module and CommonJS exports are available; importing this module should be seamless in either system.
-
-Local installation
-
 ```
-npm install ip2ldb-reader
+npm install --save ip2ldb-reader
 ```
 
 ## Usage
 
-```JavaScript
+Both ES Module and CommonJS exports are available. Importing this module should work seamlessly in either system.
+
+```js
 // Import as ES Module
 import Ip2lReader from 'ip2ldb-reader';
 // Or require as CommonJS
@@ -42,7 +44,7 @@ ip2lReader.close();
 
 ## Options
 
-```JavaScript
+```js
 {
   // {boolean} Cache database in memory
   cacheDatabaseInMemory: false,
@@ -77,16 +79,16 @@ ip2lReader.close();
 
 ## Return
 
-The object returned by `Ip2lReader.get(ip)` has the following structure:
+The object returned by `.get(ip)` has the following structure:
 
-```TypeScript
-{
+```ts
+interface Ip2lData {
   ip: string | null;
   ip_no: string | null;
   status: string | null;
 
   addresstype?: string;
-  airports?: IataIcaoData[] | null;
+  airports?: IataIcaoData[];
   areacode?: string;
   as?: string;
   asn?: string;
@@ -119,36 +121,36 @@ The object returned by `Ip2lReader.get(ip)` has the following structure:
 
 where
 
-```TypeScript
-CountryInfoData = {
-    capital: string;
-    cctld?: string;
-    country_alpha3_code?: string;
-    country_code: string;
-    country_demonym?: string;
-    country_name?: string;
-    country_numeric_code?: number | null;
-    currency_code?: string;
-    currency_name?: string;
-    currency_symbol?: string;
-    idd_code?: number | null;
-    lang_code?: string;
-    lang_name?: string;
-    population?: number | null;
-    total_area: number | null;
-  },
+```ts
+interface CountryInfoData {
+  capital: string;
+  cctld?: string;
+  country_alpha3_code?: string;
+  country_code: string;
+  country_demonym?: string;
+  country_name?: string;
+  country_numeric_code?: number | null;
+  currency_code?: string;
+  currency_name?: string;
+  currency_symbol?: string;
+  idd_code?: number | null;
+  lang_code?: string;
+  lang_name?: string;
+  population?: number | null;
+  total_area: number | null;
+}
 ```
 
 and
 
-```TypeScript
-IataIcaoData = {
-    airport: string;
-    iata: string;
-    icao: string;
-    latitude: number | null;
-    longitude: number | null;
-  },
+```ts
+interface IataIcaoData {
+  airport: string;
+  iata: string;
+  icao: string;
+  latitude: number | null;
+  longitude: number | null;
+}
 ```
 
 Properties suffixed by `?` only exist if the database supports them. For example, when using a DB1 (country only) database, a sample return object looks like
@@ -180,7 +182,7 @@ When no geolocation data is available for a supported property in the return obj
 
 ## Upgrade notes
 
-- Prior to version 2.0, unknown number values were reported as zero (`0`). Beginning with version 2.0, unknown numbers are reported as null (`null`);
+- See [releases](https://github.com/mdmower/ip2ldb-reader/releases) for information on feature updates, breaking changes, and bugfixes.
 
 ## Development
 
