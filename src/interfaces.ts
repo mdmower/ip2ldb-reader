@@ -285,4 +285,19 @@ export interface Ip2lData {
    * IATA/ICAO airport info
    */
   airports?: IataIcaoData[];
+
+  /**
+   * District name
+   */
+  district?: string;
+
+  /**
+   * Autonomous system number
+   */
+  asn?: string;
+
+  /**
+   * Autonomous system
+   */
+  as?: string;
 }
