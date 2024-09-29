@@ -3,10 +3,9 @@ import {SampleCsvReader, ReaderStatus} from './sample-csv-reader.js';
 
 // Requires sample CSV database in /database folder within project directory.
 const sampleCsvDbPath = 'database/SAMPLE-CSVTEST.CSV';
-const conditionalDescribe = fs.existsSync(sampleCsvDbPath) ? describe : describe.skip;
 
 describe('Sample CSV info', () => {
-  conditionalDescribe('Identify', () => {
+  describe('Identify', () => {
     let sampleCsvReader: SampleCsvReader;
 
     beforeAll(async () => {
@@ -28,11 +27,11 @@ describe('Sample CSV info', () => {
     });
 
     it('Does not identify non-existent row', () => {
-      expect(sampleCsvReader.get('Row X')).toEqual(null);
+      expect(sampleCsvReader.get('Row X')).toBe(null);
     });
   });
 
-  conditionalDescribe('DB watch', () => {
+  describe('DB watch', () => {
     let sampleCsvReader: SampleCsvReader;
     let initSpy: jest.SpyInstance;
     let watchSpy: jest.SpyInstance;
@@ -46,7 +45,7 @@ describe('Sample CSV info', () => {
       watchCallbackCount = 0;
       watchSpy = jest.spyOn(fs, 'watch').mockImplementation((filename, callback): FSWatcher => {
         const runCallbackAndIncrementCount = () => {
-          callback && callback('change', filename.toString());
+          if (callback) callback('change', filename.toString());
           watchCallbackCount += 1;
         };
         const timeouts = [
@@ -81,14 +80,14 @@ describe('Sample CSV info', () => {
       };
 
       await sampleCsvReader.init(sampleCsvDbPath, true);
-      expect(sampleCsvReader.readerStatus).toEqual(ReaderStatus.Ready);
+      expect(sampleCsvReader.readerStatus).toBe(ReaderStatus.Ready);
       jest.advanceTimersByTime(200);
-      expect(watchCallbackCount).toEqual(3);
+      expect(watchCallbackCount).toBe(3);
       jest.advanceTimersByTime(300);
       jest.runOnlyPendingTimers();
-      expect(sampleCsvReader.readerStatus).toEqual(ReaderStatus.Initializing);
+      expect(sampleCsvReader.readerStatus).toBe(ReaderStatus.Initializing);
       await sampleCsvReader.reloadPromise;
-      expect(sampleCsvReader.readerStatus).toEqual(ReaderStatus.Ready);
+      expect(sampleCsvReader.readerStatus).toBe(ReaderStatus.Ready);
       expect(watchSpy).toHaveBeenCalledTimes(2);
       expect(initSpy).toHaveBeenCalledTimes(2);
       expect(sampleCsvReader.get('Row 1')).toEqual(expectedResult);

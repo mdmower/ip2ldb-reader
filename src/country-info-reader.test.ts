@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import {CountryInfoReader} from './country-info-reader.js';
 import {CountryInfoData} from './interfaces.js';
 
@@ -6,10 +5,9 @@ import {CountryInfoData} from './interfaces.js';
 // https://www.ip2location.com/free/country-information
 // to be decompressed and made available in /database folder within project directory.
 const countryInfoDbPath = 'database/IP2LOCATION-COUNTRY-INFORMATION.CSV';
-const conditionalDescribe = fs.existsSync(countryInfoDbPath) ? describe : describe.skip;
 
 describe('Country info', () => {
-  conditionalDescribe('Identify', () => {
+  describe('Identify', () => {
     let countryInfoReader: CountryInfoReader;
 
     beforeAll(async () => {
@@ -40,18 +38,19 @@ describe('Country info', () => {
         cctld: 'us',
       };
 
-      const usInfo = countryInfoReader.get('US') || ({} as CountryInfoData);
-      for (const key of Object.keys(expectedResult)) {
-        if (['total_area', 'population'].includes(key)) {
-          expect(Number(usInfo[key] || 0)).toBeGreaterThan(Number(expectedResult[key] || 0));
-        } else {
-          expect(usInfo[key]).toEqual(expectedResult[key]);
-        }
+      const usInfo = countryInfoReader.get('US') ?? ({} as CountryInfoData);
+      const gtNumericKeys = ['total_area', 'population'];
+      for (const key of gtNumericKeys) {
+        expect(Number(usInfo[key] ?? 0)).toBeGreaterThan(Number(expectedResult[key] ?? 0));
+      }
+      const otherKeys = Object.keys(expectedResult).filter((key) => !gtNumericKeys.includes(key));
+      for (const key of otherKeys) {
+        expect(usInfo[key]).toBe(expectedResult[key]);
       }
     });
 
     it('Does not identify XX country info', () => {
-      expect(countryInfoReader.get('XX')).toEqual(null);
+      expect(countryInfoReader.get('XX')).toBe(null);
     });
   });
 });

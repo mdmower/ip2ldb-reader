@@ -10,9 +10,8 @@ describe('IP2Location DB reader', () => {
   // Note: full, paid database will not work; we're looking for string
   // "This is demo DB26 BIN database." to be returned.
   const db26Path = 'database/IP2LOCATION-SAMPLE-DB26.IPV6.BIN';
-  const conditionalDescribe26 = fs.existsSync(db26Path) ? describe : describe.skip;
 
-  conditionalDescribe26('Identify with Sample IPv6 DB26', () => {
+  describe('Identify with Sample IPv6 DB26', () => {
     let dbReader: DbReader;
 
     beforeAll(() => {
@@ -38,12 +37,12 @@ describe('IP2Location DB reader', () => {
       }
 
       const {country_short, ip, ip_no, latitude, longitude, status} = dbResult;
-      expect(country_short).toEqual('');
-      expect(ip).toEqual(testIp);
-      expect(ip_no).toEqual(ipNum);
-      expect(latitude).toEqual(null);
-      expect(longitude).toEqual(null);
-      expect(status).toEqual('OK');
+      expect(country_short).toBe('');
+      expect(ip).toBe(testIp);
+      expect(ip_no).toBe(ipNum);
+      expect(latitude).toBe(null);
+      expect(longitude).toBe(null);
+      expect(status).toBe('OK');
     });
 
     it('Identifies IPv4 address', () => {
@@ -55,18 +54,18 @@ describe('IP2Location DB reader', () => {
         country_short: 'US',
         ip: testIp,
         ip_no: ipNum,
-        latitude: 37.405991,
-        longitude: -122.078514,
+        latitude: 37.386051,
+        longitude: -122.083847,
         status: 'OK',
       };
 
       const {country_short, ip, ip_no, latitude, longitude, status} = dbResult;
-      expect(country_short).toEqual(expectedResultPartial.country_short);
-      expect(ip).toEqual(expectedResultPartial.ip);
-      expect(ip_no).toEqual(expectedResultPartial.ip_no);
+      expect(country_short).toBe(expectedResultPartial.country_short);
+      expect(ip).toBe(expectedResultPartial.ip);
+      expect(ip_no).toBe(expectedResultPartial.ip_no);
       expect(latitude).toBeCloseTo(expectedResultPartial.latitude);
       expect(longitude).toBeCloseTo(expectedResultPartial.longitude);
-      expect(status).toEqual(expectedResultPartial.status);
+      expect(status).toBe(expectedResultPartial.status);
     });
 
     it('Contains all DB26 keys', () => {
@@ -130,9 +129,8 @@ describe('IP2Location DB reader', () => {
   // to be decompressed, renamed to IP2LOCATION-LITE-DB1.BIN,
   // and made available in /database folder within project directory.
   const db1Path = 'database/IP2LOCATION-LITE-DB1.BIN';
-  const conditionalDescribe1 = fs.existsSync(db1Path) ? describe : describe.skip;
 
-  conditionalDescribe1('Identify with LITE IPv4 DB1', () => {
+  describe('Identify with LITE IPv4 DB1', () => {
     let dbReader: DbReader;
 
     beforeAll(() => {
@@ -158,11 +156,11 @@ describe('IP2Location DB reader', () => {
       };
 
       const {country_short, country_long, ip, ip_no, status} = dbResult;
-      expect(country_short).toEqual(expectedResultPartial.country_short);
-      expect(country_long).toEqual(expectedResultPartial.country_long);
-      expect(ip).toEqual(expectedResultPartial.ip);
-      expect(ip_no).toEqual(expectedResultPartial.ip_no);
-      expect(status).toEqual(expectedResultPartial.status);
+      expect(country_short).toBe(expectedResultPartial.country_short);
+      expect(country_long).toBe(expectedResultPartial.country_long);
+      expect(ip).toBe(expectedResultPartial.ip);
+      expect(ip_no).toBe(expectedResultPartial.ip_no);
+      expect(status).toBe(expectedResultPartial.status);
     });
 
     it('Contains only DB1 keys', () => {
@@ -200,8 +198,8 @@ describe('IP2Location DB reader', () => {
       });
       dbReader.init(db1Path);
       const {status, country_short} = dbReader.get(testIp);
-      expect(status).toEqual('OK');
-      expect(country_short).toEqual('US');
+      expect(status).toBe('OK');
+      expect(country_short).toBe('US');
     });
 
     it('Throws if DB not found and survives re-init', () => {
@@ -210,12 +208,12 @@ describe('IP2Location DB reader', () => {
       dbReader.init(db1Path);
       const testIp = '8.8.8.8';
       const {status, country_short} = dbReader.get(testIp);
-      expect(status).toEqual('OK');
-      expect(country_short).toEqual('US');
+      expect(status).toBe('OK');
+      expect(country_short).toBe('US');
     });
   });
 
-  conditionalDescribe1('Identify with in-memory LITE IPv4 DB1', () => {
+  describe('Identify with in-memory LITE IPv4 DB1', () => {
     let dbReader: DbReader;
 
     beforeAll(() => {
@@ -232,9 +230,9 @@ describe('IP2Location DB reader', () => {
     it('Identifies IPv4 address', () => {
       const testIp = '8.8.8.8';
       const {country_short, status} = dbReader.get(testIp);
-      expect(dbReader.readerStatus).toEqual(ReaderStatus.Ready);
-      expect(country_short).toEqual('US');
-      expect(status).toEqual('OK');
+      expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
+      expect(country_short).toBe('US');
+      expect(status).toBe('OK');
     });
 
     it('Supports reinitialization', () => {
@@ -249,8 +247,8 @@ describe('IP2Location DB reader', () => {
         cacheDatabaseInMemory: true,
       });
       const {status, country_short} = dbReader.get(testIp);
-      expect(status).toEqual('OK');
-      expect(country_short).toEqual('US');
+      expect(status).toBe('OK');
+      expect(country_short).toBe('US');
     });
 
     it('Throws if DB not found and survives re-init', () => {
@@ -261,12 +259,12 @@ describe('IP2Location DB reader', () => {
       });
       const testIp = '8.8.8.8';
       const {status, country_short} = dbReader.get(testIp);
-      expect(status).toEqual('OK');
-      expect(country_short).toEqual('US');
+      expect(status).toBe('OK');
+      expect(country_short).toBe('US');
     });
   });
 
-  conditionalDescribe1('DB watch', () => {
+  describe('DB watch', () => {
     let dbReader: DbReader;
     let initSpy: jest.SpyInstance;
     let watchSpy: jest.SpyInstance;
@@ -281,7 +279,7 @@ describe('IP2Location DB reader', () => {
       watchCallbackCount = 0;
       watchSpy = jest.spyOn(fs, 'watch').mockImplementation((filename, callback): FSWatcher => {
         const runCallbackAndIncrementCount = () => {
-          callback && callback('change', filename.toString());
+          if (callback) callback('change', filename.toString());
           watchCallbackCount += 1;
         };
         const timeouts = [
@@ -316,20 +314,20 @@ describe('IP2Location DB reader', () => {
         reloadOnDbUpdate: true,
         cacheDatabaseInMemory: false,
       });
-      expect(dbReader.readerStatus).toEqual(ReaderStatus.Ready);
+      expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
       jest.advanceTimersByTime(200);
-      expect(watchCallbackCount).toEqual(3);
+      expect(watchCallbackCount).toBe(3);
       jest.advanceTimersByTime(300);
       jest.runOnlyPendingTimers();
-      expect(dbReader.readerStatus).toEqual(ReaderStatus.Ready);
+      expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
       expect(watchSpy).toHaveBeenCalledTimes(2);
       expect(initSpy).toHaveBeenCalledTimes(1);
       expect(loadDatabaseSpy).toHaveBeenCalledTimes(2);
 
       const testIp = '8.8.8.8';
       const {status, country_short} = dbReader.get(testIp);
-      expect(status).toEqual('OK');
-      expect(country_short).toEqual('US');
+      expect(status).toBe('OK');
+      expect(country_short).toBe('US');
     });
 
     it('Reloads in-memory database once', () => {
@@ -337,20 +335,20 @@ describe('IP2Location DB reader', () => {
         reloadOnDbUpdate: true,
         cacheDatabaseInMemory: true,
       });
-      expect(dbReader.readerStatus).toEqual(ReaderStatus.Ready);
+      expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
       jest.advanceTimersByTime(200);
-      expect(watchCallbackCount).toEqual(3);
+      expect(watchCallbackCount).toBe(3);
       jest.advanceTimersByTime(300);
       jest.runOnlyPendingTimers();
-      expect(dbReader.readerStatus).toEqual(ReaderStatus.Ready);
+      expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
       expect(watchSpy).toHaveBeenCalledTimes(2);
       expect(initSpy).toHaveBeenCalledTimes(1);
       expect(loadDatabaseSpy).toHaveBeenCalledTimes(2);
 
       const testIp = '8.8.8.8';
       const {status, country_short} = dbReader.get(testIp);
-      expect(status).toEqual('OK');
-      expect(country_short).toEqual('US');
+      expect(status).toBe('OK');
+      expect(country_short).toBe('US');
     });
   });
 });

@@ -1,12 +1,8 @@
 import {ReaderStatus, CsvReader} from './csv-reader.js';
 
-interface SampleResult {
-  [key: string]: string | number;
-}
+type SampleResult = Record<string, string | number>;
 
-interface SampleCsvMap {
-  [key: string]: SampleResult | undefined;
-}
+type SampleCsvMap = Record<string, SampleResult | undefined>;
 
 class SampleCsvReader extends CsvReader {
   private sampleCsvMap_: SampleCsvMap;
@@ -21,7 +17,7 @@ class SampleCsvReader extends CsvReader {
    * Process line from sample CSV database
    * @param record Individual row from CSV database, broken into key/value pairs based on CSV headers
    */
-  protected processRecord(record: {[key: string]: string}): void {
+  protected processRecord(record: Record<string, string>): void {
     const {column_1, column_2, column_3} = record;
 
     this.sampleCsvMap_[column_1] = {
@@ -47,7 +43,7 @@ class SampleCsvReader extends CsvReader {
       return null;
     }
 
-    return this.sampleCsvMap_[firstColumn] || null;
+    return this.sampleCsvMap_[firstColumn] ?? null;
   }
 }
 

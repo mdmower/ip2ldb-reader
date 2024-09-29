@@ -22,7 +22,7 @@ export function parseIp(ip: string): {ip: string; ipVersion: number; ipNum: bigi
       ipVersion = net.isIP(ip);
     } else if (/^[:0]+F{4}(:[\dA-Z]{4}){2}$/i.test(ip)) {
       const tmp = ip.replace(/^[:0]+F{4}:/i, '').replace(/:/, '');
-      ip = (tmp.match(/../g) || []).map((b) => parseInt('0x' + b)).join('.');
+      ip = (tmp.match(/../g) ?? []).map((b) => parseInt('0x' + b)).join('.');
       ipVersion = net.isIP(ip);
     }
   }

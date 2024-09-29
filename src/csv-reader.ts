@@ -30,7 +30,7 @@ abstract class CsvReader {
     let firstRecord = true;
 
     for await (const record of parser) {
-      const inputData = record as {[key: string]: string};
+      const inputData = record as Record<string, string>;
 
       if (
         firstRecord &&
@@ -49,7 +49,7 @@ abstract class CsvReader {
    * Process line from CSV database
    * @param record Individual row from CSV database, broken into key/value pairs based on CSV headers
    */
-  protected abstract processRecord(record: {[key: string]: string}): void;
+  protected abstract processRecord(record: Record<string, string>): void;
 
   /**
    * Get reader status

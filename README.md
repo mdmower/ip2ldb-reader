@@ -110,7 +110,7 @@ interface Ip2lData {
   mobilebrand?: string;
   netspeed?: string;
   region?: string;
-  subdivision?: string;
+  subdivision?: string | null;
   timezone?: string;
   usagetype?: string;
   weatherstationcode?: string;

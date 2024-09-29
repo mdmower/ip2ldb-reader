@@ -63,12 +63,12 @@ const loopTest = (ip2Location: Ip2lReader) => {
     try {
       const ip2lData = ip2Location.get('2A04:6800:4001:c01::93');
       if (ip2lData.status !== 'OK') {
-        console.log(`Status: ${ip2lData.status || 'null'}`);
+        console.log(`Status: ${ip2lData.status ?? 'null'}`);
       } else {
         if ((iteration - 1) % 40 === 0) {
-          const country_short = ip2lData.country_short || '';
-          const region = ip2lData.region || '';
-          const subdivision = ip2lData.subdivision || '';
+          const country_short = ip2lData.country_short ?? '';
+          const region = ip2lData.region ?? '';
+          const subdivision = ip2lData.subdivision ?? '';
           console.log(
             `Iteration: ${iteration}, Status: ${ip2lData.status}\n  Country: ${country_short}, Region: ${region}, Subdivision: ${subdivision}`
           );
@@ -84,7 +84,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
   let databaseDirContents: fs.Dirent[];
   try {
     databaseDirContents = await fsp.readdir('./database', {withFileTypes: true});
-  } catch (ex) {
+  } catch {
     return exitWithInstructions();
   }
 
@@ -164,7 +164,7 @@ const loopTest = (ip2Location: Ip2lReader) => {
   [subdivisionFilename, geoNameIdFilename, countryInfoFilename, iataIcaoFilename]
     .filter(Boolean)
     .forEach((filename) => {
-      console.log(`  ${filename || ''}`);
+      console.log(`  ${filename ?? ''}`);
     });
   process.stdout.write('  ... ');
 
@@ -194,12 +194,12 @@ const loopTest = (ip2Location: Ip2lReader) => {
 
   process.stdout.write('done.\n\n');
 
-  const supportedOperations: {[key: string]: string | undefined} = {
+  const supportedOperations: Record<string, string | undefined> = {
     '1': 'Query by IP input',
     '2': 'Loop test',
   };
   const operationsList = Object.keys(supportedOperations).map(
-    (key) => `  ${key}: ${supportedOperations[key] || ''}`
+    (key) => `  ${key}: ${supportedOperations[key] ?? ''}`
   );
   console.log('Operations:\n' + operationsList.join('\n') + '\n');
 

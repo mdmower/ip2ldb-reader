@@ -1,13 +1,11 @@
-import fs from 'node:fs';
 import {GeoNameIdReader} from './geonameid-reader.js';
 
 // Requires CSV subdivision database from https://www.ip2location.com/free/geoname-id
 // to be decompressed and made available in /database folder within project directory.
 const geonameidDbPath = 'database/IP2LOCATION-GEONAMEID.CSV';
-const conditionalDescribe = fs.existsSync(geonameidDbPath) ? describe : describe.skip;
 
 describe('GeoName ID', () => {
-  conditionalDescribe('Identify', () => {
+  describe('Identify', () => {
     let geoNameIdReader: GeoNameIdReader;
 
     beforeAll(async () => {
@@ -20,11 +18,11 @@ describe('GeoName ID', () => {
     });
 
     it('Identifies US, California, Los Angeles GeoName ID', () => {
-      expect(geoNameIdReader.get('US', 'California', 'Los Angeles')).toEqual(5368361);
+      expect(geoNameIdReader.get('US', 'California', 'Los Angeles')).toBe(5368361);
     });
 
     it('Does not identify XX, Abcdef, Ghijkl GeoName ID', () => {
-      expect(geoNameIdReader.get('XX', 'Abcdef', 'Ghijkl')).toEqual(null);
+      expect(geoNameIdReader.get('XX', 'Abcdef', 'Ghijkl')).toBe(null);
     });
   });
 });

@@ -3,9 +3,7 @@ import {parseIp} from './ip-utils.js';
 import {Ip2lData, Ip2lOptions} from './interfaces.js';
 
 // prettier-ignore
-const Position: {
-  [key: string]: number[];
-} = {
+const Position = {
   country: [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
   region: [0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
   city: [0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
@@ -51,8 +49,8 @@ class DbReader {
   private fsWatcher_: FSWatcher | null;
   private indiciesIPv4_: number[][];
   private indiciesIPv6_: number[][];
-  private offset_: {[key: string]: number};
-  private enabled_: {[key: string]: boolean};
+  private offset_: Record<keyof typeof Position, number>;
+  private enabled_: Record<keyof typeof Position, boolean>;
   private dbStats_: {
     DBType: number;
     DBColumn: number;
@@ -86,9 +84,8 @@ class DbReader {
     this.indiciesIPv4_ = [];
     this.indiciesIPv6_ = [];
 
-    this.offset_ = {};
-
-    this.enabled_ = {};
+    this.offset_ = {} as Record<keyof typeof Position, number>;
+    this.enabled_ = {} as Record<keyof typeof Position, boolean>;
 
     this.dbStats_ = {
       DBType: 0,
@@ -234,7 +231,7 @@ class DbReader {
     if (this.fd_ !== null) {
       try {
         fs.closeSync(this.fd_);
-      } catch (ex) {
+      } catch {
         // do nothing
       }
     }
@@ -247,20 +244,20 @@ class DbReader {
       this.dbCache_ = null;
     }
 
-    this.dbStats_.DBType = this.readInt8(1) || 0;
-    this.dbStats_.DBColumn = this.readInt8(2) || 0;
-    this.dbStats_.DBYear = this.readInt8(3) || 0;
-    this.dbStats_.DBMonth = this.readInt8(4) || 0;
-    this.dbStats_.DBDay = this.readInt8(5) || 0;
-    this.dbStats_.DBCount = this.readInt32(6) || 0;
-    this.dbStats_.BaseAddr = this.readInt32(10) || 0;
-    this.dbStats_.DBCountIPv6 = this.readInt32(14) || 0;
-    this.dbStats_.BaseAddrIPv6 = this.readInt32(18) || 0;
-    this.dbStats_.IndexBaseAddr = this.readInt32(22) || 0;
-    this.dbStats_.IndexBaseAddrIPv6 = this.readInt32(26) || 0;
-    this.dbStats_.ProductCode = this.readInt8(30) || 0;
-    this.dbStats_.ProductType = this.readInt8(31) || 0;
-    this.dbStats_.FileSize = this.readInt32(32) || 0;
+    this.dbStats_.DBType = this.readInt8(1) ?? 0;
+    this.dbStats_.DBColumn = this.readInt8(2) ?? 0;
+    this.dbStats_.DBYear = this.readInt8(3) ?? 0;
+    this.dbStats_.DBMonth = this.readInt8(4) ?? 0;
+    this.dbStats_.DBDay = this.readInt8(5) ?? 0;
+    this.dbStats_.DBCount = this.readInt32(6) ?? 0;
+    this.dbStats_.BaseAddr = this.readInt32(10) ?? 0;
+    this.dbStats_.DBCountIPv6 = this.readInt32(14) ?? 0;
+    this.dbStats_.BaseAddrIPv6 = this.readInt32(18) ?? 0;
+    this.dbStats_.IndexBaseAddr = this.readInt32(22) ?? 0;
+    this.dbStats_.IndexBaseAddrIPv6 = this.readInt32(26) ?? 0;
+    this.dbStats_.ProductCode = this.readInt8(30) ?? 0;
+    this.dbStats_.ProductType = this.readInt8(31) ?? 0;
+    this.dbStats_.FileSize = this.readInt32(32) ?? 0;
 
     // Check if this is a valid BIN. ProductCode should be 1 for BIN files from Jan 2021 onwards.
     if (this.dbStats_.ProductCode !== 1 && this.dbStats_.DBYear >= 21) {
@@ -285,13 +282,10 @@ class DbReader {
 
     const dbType = this.dbStats_.DBType;
 
-    Object.keys(Position).forEach((key) => {
+    for (const key of Object.keys(Position) as (keyof typeof Position)[]) {
       this.offset_[key] = Position[key][dbType] ? (Position[key][dbType] - 2) << 2 : 0;
-    });
-
-    Object.keys(Position).forEach((key) => {
       this.enabled_[key] = Boolean(Position[key][dbType]);
-    });
+    }
 
     this.indiciesIPv4_ = new Array<number[]>(MAX_SIZE);
     this.indiciesIPv6_ = new Array<number[]>(MAX_SIZE);
@@ -300,13 +294,13 @@ class DbReader {
       let pointer = this.dbStats_.IndexBaseAddr;
 
       for (let x = 0; x < MAX_SIZE; x++) {
-        this.indiciesIPv4_[x] = [this.readInt32(pointer) || 0, this.readInt32(pointer + 4) || 0];
+        this.indiciesIPv4_[x] = [this.readInt32(pointer) ?? 0, this.readInt32(pointer + 4) ?? 0];
         pointer += 8;
       }
 
       if (this.dbStats_.IndexedIPv6) {
         for (let x = 0; x < MAX_SIZE; x++) {
-          this.indiciesIPv6_[x] = [this.readInt32(pointer) || 0, this.readInt32(pointer + 4) || 0];
+          this.indiciesIPv6_[x] = [this.readInt32(pointer) ?? 0, this.readInt32(pointer + 4) ?? 0];
           pointer += 8;
         }
       }
@@ -331,7 +325,7 @@ class DbReader {
     if (this.fd_ !== null) {
       try {
         fs.closeSync(this.fd_);
-      } catch (ex) {
+      } catch {
         // do nothing
       }
     }
@@ -349,9 +343,8 @@ class DbReader {
     this.indiciesIPv4_ = [];
     this.indiciesIPv6_ = [];
 
-    this.offset_ = {};
-
-    this.enabled_ = {};
+    this.offset_ = {} as Record<keyof typeof Position, number>;
+    this.enabled_ = {} as Record<keyof typeof Position, boolean>;
 
     this.dbStats_ = {
       DBType: 0,
@@ -387,11 +380,11 @@ class DbReader {
     }
 
     this.dbPath_ = dbPath;
-    this.cacheInMemory_ = options?.cacheDatabaseInMemory || false;
+    this.cacheInMemory_ = options?.cacheDatabaseInMemory ?? false;
 
     this.loadDatabase();
 
-    if (options && options.reloadOnDbUpdate) {
+    if (options?.reloadOnDbUpdate) {
       this.watchDbFile();
     }
   }
@@ -509,20 +502,21 @@ class DbReader {
           break;
         }
 
-        Object.keys(this.enabled_)
-          .filter((key) => this.enabled_[key])
-          .forEach((key) => {
-            if (key === 'country') {
-              const countrypos = this.readBufferInt32(this.offset_[key], buff);
-              data['country_short'] = this.readString(countrypos) || '';
-              data['country_long'] = this.readString(countrypos + 3) || '';
-            } else if (key === 'longitude' || key === 'latitude') {
-              const num = this.readBufferFloat(this.offset_[key], buff);
-              data[key] = num !== 0 ? Math.round(num * 1000000) / 1000000 : null;
-            } else {
-              data[key] = this.readString(this.readBufferInt32(this.offset_[key], buff)) || '';
-            }
-          });
+        const enabledKeys = (Object.keys(this.enabled_) as (keyof typeof Position)[]).filter(
+          (key) => this.enabled_[key]
+        );
+        for (const key of enabledKeys) {
+          if (key === 'country') {
+            const countrypos = this.readBufferInt32(this.offset_[key], buff);
+            data.country_short = this.readString(countrypos) ?? '';
+            data.country_long = this.readString(countrypos + 3) ?? '';
+          } else if (key === 'longitude' || key === 'latitude') {
+            const num = this.readBufferFloat(this.offset_[key], buff);
+            data[key] = num !== 0 ? Math.round(num * 1000000) / 1000000 : null;
+          } else {
+            data[key] = this.readString(this.readBufferInt32(this.offset_[key], buff)) ?? '';
+          }
+        }
 
         data.status = 'OK';
         return;

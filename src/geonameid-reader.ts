@@ -1,8 +1,9 @@
 import {CsvReader, ReaderStatus} from './csv-reader.js';
 
-interface GeoNameIdMap {
-  [key: string]: {[key: string]: {[key: string]: number | undefined} | undefined} | undefined;
-}
+type GeoNameIdMap = Record<
+  string,
+  Record<string, Record<string, number | undefined> | undefined> | undefined
+>;
 
 class GeoNameIdReader extends CsvReader {
   private geoNameIdMap_: GeoNameIdMap;
@@ -17,14 +18,14 @@ class GeoNameIdReader extends CsvReader {
    * Process line from IP2Location GeoName ID database
    * @param record Individual row from CSV database, broken into key/value pairs based on CSV headers
    */
-  protected processRecord(record: {[key: string]: string}): void {
+  protected processRecord(record: Record<string, string>): void {
     const {country_code, region_name, city_name, geonameid} = record;
     if (!/^\d+$/.test(geonameid)) {
       return;
     }
 
-    const countryMap = this.geoNameIdMap_[country_code] || {};
-    const regionMap = countryMap[region_name] || {};
+    const countryMap = this.geoNameIdMap_[country_code] ?? {};
+    const regionMap = countryMap[region_name] ?? {};
     regionMap[city_name] = parseInt(geonameid);
     countryMap[region_name] = regionMap;
     this.geoNameIdMap_[country_code] = countryMap;
@@ -49,11 +50,10 @@ class GeoNameIdReader extends CsvReader {
       return null;
     }
     if (!country || !region || !city) {
-      return 0;
+      return null;
     }
 
-    const geoNameId = ((this.geoNameIdMap_[country] || {})[region] || {})[city];
-    return geoNameId != undefined ? geoNameId : null;
+    return this.geoNameIdMap_[country]?.[region]?.[city] ?? null;
   }
 }
 

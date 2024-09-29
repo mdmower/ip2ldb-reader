@@ -1,9 +1,7 @@
 import {CsvReader, ReaderStatus} from './csv-reader.js';
 import {IataIcaoData} from './interfaces.js';
 
-interface IataIcaoMap {
-  [key: string]: {[key: string]: IataIcaoData[] | undefined} | undefined;
-}
+type IataIcaoMap = Record<string, Record<string, IataIcaoData[] | undefined> | undefined>;
 
 class IataIcaoReader extends CsvReader {
   private iataIcaoMap_: IataIcaoMap;
@@ -25,7 +23,7 @@ class IataIcaoReader extends CsvReader {
    * Process line from IP2Location IATA/ICAO airport database
    * @param record Individual row from CSV database, broken into key/value pairs based on CSV headers
    */
-  protected processRecord(record: {[key: string]: string}): void {
+  protected processRecord(record: Record<string, string>): void {
     const normalizeStr = (val: string): string => {
       return val.replace(/^-$/, '');
     };
@@ -54,8 +52,8 @@ class IataIcaoReader extends CsvReader {
         : normalizeStr(record[key]);
     }
 
-    const countryMap = this.iataIcaoMap_[country_code] || {};
-    const regionArray = countryMap[region_name] || [];
+    const countryMap = this.iataIcaoMap_[country_code] ?? {};
+    const regionArray = countryMap[region_name] ?? [];
     regionArray.push(airportOutputData);
     countryMap[region_name] = regionArray;
     this.iataIcaoMap_[country_code] = countryMap;
@@ -82,7 +80,7 @@ class IataIcaoReader extends CsvReader {
       return [];
     }
 
-    return (this.iataIcaoMap_[country] || {})[region] || [];
+    return this.iataIcaoMap_[country]?.[region] ?? [];
   }
 }
 

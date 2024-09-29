@@ -1,9 +1,7 @@
 import {CsvReader, ReaderStatus} from './csv-reader.js';
 import {CountryInfoData} from './interfaces.js';
 
-interface CountryInfoMap {
-  [key: string]: CountryInfoData | undefined;
-}
+type CountryInfoMap = Record<string, CountryInfoData | undefined>;
 
 class CountryInfoReader extends CsvReader {
   private countryInfoMap_: CountryInfoMap;
@@ -18,7 +16,7 @@ class CountryInfoReader extends CsvReader {
    * Process line from IP2Location country info database
    * @param record Individual row from CSV database, broken into key/value pairs based on CSV headers
    */
-  protected processRecord(record: {[key: string]: string}): void {
+  protected processRecord(record: Record<string, string>): void {
     const normalizeStr = (val: string): string => {
       return val.replace(/^-$/, '');
     };
@@ -70,7 +68,7 @@ class CountryInfoReader extends CsvReader {
       return null;
     }
 
-    return this.countryInfoMap_[country] || null;
+    return this.countryInfoMap_[country] ?? null;
   }
 }
 

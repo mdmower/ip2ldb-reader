@@ -1,8 +1,6 @@
 import {ReaderStatus, CsvReader} from './csv-reader.js';
 
-interface SubdivisionMap {
-  [key: string]: {[key: string]: string | undefined} | undefined;
-}
+type SubdivisionMap = Record<string, Record<string, string | undefined> | undefined>;
 
 class SubdivReader extends CsvReader {
   private subdivisionMap_: SubdivisionMap;
@@ -17,7 +15,7 @@ class SubdivReader extends CsvReader {
    * Process line from IP2Location subdivision database
    * @param record Individual row from CSV database, broken into key/value pairs based on CSV headers
    */
-  protected processRecord(record: {[key: string]: string}): void {
+  protected processRecord(record: Record<string, string>): void {
     const {country_code, subdivision_name, code} = record;
 
     const subdivisionCode = code?.length > 3 ? code.substring(3) : undefined;
@@ -25,7 +23,7 @@ class SubdivReader extends CsvReader {
       return;
     }
 
-    const countryMap = this.subdivisionMap_[country_code] || {};
+    const countryMap = this.subdivisionMap_[country_code] ?? {};
     countryMap[subdivision_name] = subdivisionCode;
     this.subdivisionMap_[country_code] = countryMap;
   }
@@ -48,10 +46,10 @@ class SubdivReader extends CsvReader {
       return null;
     }
     if (!country || !region) {
-      return '';
+      return null;
     }
 
-    return (this.subdivisionMap_[country] || {})[region] || '';
+    return this.subdivisionMap_[country]?.[region] ?? null;
   }
 }
 
