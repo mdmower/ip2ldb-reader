@@ -1,4 +1,4 @@
-import {GeoNameIdReader} from './geonameid-reader.js';
+import {GeoNameIdReader} from '../src/geonameid-reader.js';
 
 // Requires CSV subdivision database from https://www.ip2location.com/free/geoname-id
 // to be decompressed and made available in /database folder within project directory.

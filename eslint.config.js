@@ -4,7 +4,7 @@ import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import jsdoc from 'eslint-plugin-jsdoc';
-import jest from 'eslint-plugin-jest';
+import vitest from '@vitest/eslint-plugin';
 import prettierConfigRecommended from 'eslint-plugin-prettier/recommended';
 
 export default tseslint.config(
@@ -36,14 +36,6 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/no-inferrable-types': 'off',
-    },
-  },
-  {
-    files: ['**/*.test.ts', 'src/cli.ts'],
-    languageOptions: {
-      parserOptions: {
-        project: 'tsconfig.dev.json',
-      },
     },
   },
   {
@@ -85,14 +77,8 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.test.ts'],
-    ...jest.configs['flat/recommended'],
-  },
-  {
-    files: ['**/*.test.ts'],
-    languageOptions: {
-      globals: {...globals.jest},
-    },
+    files: ['tests/**/*.ts'],
+    ...vitest.configs.recommended,
   },
   prettierConfigRecommended
 );

@@ -1,5 +1,5 @@
-import {Ip2lReader} from './index.js';
-import {parseIp} from './ip-utils.js';
+import {Ip2lReader} from '../src/index.js';
+import {parseIp} from '../src/ip-utils.js';
 
 describe('Multiple DB readers', () => {
   // Requires sample BIN IPV6 DB26 database from

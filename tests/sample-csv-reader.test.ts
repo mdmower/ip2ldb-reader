@@ -1,5 +1,6 @@
 import fs, {FSWatcher} from 'node:fs';
-import {SampleCsvReader, ReaderStatus} from './sample-csv-reader.js';
+import {SampleCsvReader, ReaderStatus} from '../src/sample-csv-reader.js';
+import {MockInstance} from 'vitest';
 
 // Requires sample CSV database in /database folder within project directory.
 const sampleCsvDbPath = 'database/SAMPLE-CSVTEST.CSV';
@@ -33,17 +34,17 @@ describe('Sample CSV info', () => {
 
   describe('DB watch', () => {
     let sampleCsvReader: SampleCsvReader;
-    let initSpy: jest.SpyInstance;
-    let watchSpy: jest.SpyInstance;
+    let initSpy: MockInstance;
+    let watchSpy: MockInstance;
     let watchCallbackCount: number;
 
     beforeAll(() => {
-      jest.useFakeTimers();
+      vitest.useFakeTimers();
     });
 
     beforeEach(() => {
       watchCallbackCount = 0;
-      watchSpy = jest.spyOn(fs, 'watch').mockImplementation((filename, callback): FSWatcher => {
+      watchSpy = vitest.spyOn(fs, 'watch').mockImplementation((filename, callback): FSWatcher => {
         const runCallbackAndIncrementCount = () => {
           if (callback) callback('change', filename.toString());
           watchCallbackCount += 1;
@@ -60,17 +61,17 @@ describe('Sample CSV info', () => {
 
       sampleCsvReader = new SampleCsvReader();
 
-      initSpy = jest.spyOn(sampleCsvReader, 'init');
+      initSpy = vitest.spyOn(sampleCsvReader, 'init');
     });
 
     afterEach(() => {
       sampleCsvReader.close();
-      jest.restoreAllMocks();
+      vitest.restoreAllMocks();
     });
 
     afterAll(() => {
-      jest.clearAllTimers();
-      jest.useRealTimers();
+      vitest.clearAllTimers();
+      vitest.useRealTimers();
     });
 
     it('Reloads database once', async () => {
@@ -81,10 +82,10 @@ describe('Sample CSV info', () => {
 
       await sampleCsvReader.init(sampleCsvDbPath, true);
       expect(sampleCsvReader.readerStatus).toBe(ReaderStatus.Ready);
-      jest.advanceTimersByTime(200);
+      vitest.advanceTimersByTime(200);
       expect(watchCallbackCount).toBe(3);
-      jest.advanceTimersByTime(300);
-      jest.runOnlyPendingTimers();
+      vitest.advanceTimersByTime(300);
+      vitest.runOnlyPendingTimers();
       expect(sampleCsvReader.readerStatus).toBe(ReaderStatus.Initializing);
       await sampleCsvReader.reloadPromise;
       expect(sampleCsvReader.readerStatus).toBe(ReaderStatus.Ready);

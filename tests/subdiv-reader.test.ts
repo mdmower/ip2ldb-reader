@@ -1,4 +1,4 @@
-import {SubdivReader} from './subdiv-reader.js';
+import {SubdivReader} from '../src/subdiv-reader.js';
 
 // Requires CSV subdivision database from https://www.ip2location.com/free/iso3166-2
 // to be decompressed and made available in /database folder within project directory.

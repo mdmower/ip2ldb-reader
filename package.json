@@ -17,7 +17,7 @@
     "format": "prettier --write .",
     "lint": "eslint .",
     "prepare": "npm run compile",
-    "test": "jest"
+    "test": "vitest"
   },
   "engines": {
     "node": ">= 18.19.0"
@@ -39,29 +39,6 @@
     "url": "https://github.com/mdmower/ip2ldb-reader/issues"
   },
   "homepage": "https://github.com/mdmower/ip2ldb-reader#readme",
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "verbose": true,
-    "modulePathIgnorePatterns": [
-      "<rootDir>/lib/"
-    ],
-    "transform": {
-      "\\.[jt]s$": [
-        "ts-jest",
-        {
-          "useESM": true,
-          "tsconfig": "tsconfig.dev.json"
-        }
-      ]
-    },
-    "moduleNameMapper": {
-      "(.+)\\.js": "$1"
-    },
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ]
-  },
   "overrides": {
     "esbuild": "0.25.0"
   },
@@ -70,20 +47,18 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@types/jest": "^29.5.14",
     "@types/node": "^18.19.76",
+    "@vitest/eslint-plugin": "^1.1.38",
     "eslint": "^9.21.0",
     "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-jest": "^28.11.0",
     "eslint-plugin-jsdoc": "^50.6.3",
     "eslint-plugin-prettier": "^5.2.3",
-    "jest": "^29.7.0",
     "prettier": "^3.5.2",
     "publint": "^0.3.6",
     "rimraf": "^6.0.1",
-    "ts-jest": "^29.2.6",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.1"
+    "typescript-eslint": "^8.24.1",
+    "vitest": "^3.0.9"
   }
 }

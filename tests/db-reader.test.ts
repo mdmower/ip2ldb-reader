@@ -1,6 +1,7 @@
 import fs, {FSWatcher} from 'node:fs';
-import {DbReader, ReaderStatus} from './db-reader.js';
-import {parseIp} from './ip-utils.js';
+import {DbReader, ReaderStatus} from '../src/db-reader.js';
+import {parseIp} from '../src/ip-utils.js';
+import {MockInstance} from 'vitest';
 
 describe('IP2Location DB reader', () => {
   // Requires sample BIN IPV6 DB26 database from
@@ -266,18 +267,18 @@ describe('IP2Location DB reader', () => {
 
   describe('DB watch', () => {
     let dbReader: DbReader;
-    let initSpy: jest.SpyInstance;
-    let watchSpy: jest.SpyInstance;
-    let loadDatabaseSpy: jest.SpyInstance;
+    let initSpy: MockInstance;
+    let watchSpy: MockInstance;
+    let loadDatabaseSpy: MockInstance;
     let watchCallbackCount: number;
 
     beforeAll(() => {
-      jest.useFakeTimers();
+      vitest.useFakeTimers();
     });
 
     beforeEach(() => {
       watchCallbackCount = 0;
-      watchSpy = jest.spyOn(fs, 'watch').mockImplementation((filename, callback): FSWatcher => {
+      watchSpy = vitest.spyOn(fs, 'watch').mockImplementation((filename, callback): FSWatcher => {
         const runCallbackAndIncrementCount = () => {
           if (callback) callback('change', filename.toString());
           watchCallbackCount += 1;
@@ -294,19 +295,19 @@ describe('IP2Location DB reader', () => {
 
       dbReader = new DbReader();
 
-      initSpy = jest.spyOn(dbReader, 'init');
+      initSpy = vitest.spyOn(dbReader, 'init');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      loadDatabaseSpy = jest.spyOn(DbReader.prototype as any, 'loadDatabase');
+      loadDatabaseSpy = vitest.spyOn(DbReader.prototype as any, 'loadDatabase');
     });
 
     afterEach(() => {
-      jest.clearAllTimers();
-      jest.restoreAllMocks();
+      vitest.clearAllTimers();
+      vitest.restoreAllMocks();
       dbReader.close();
     });
 
     afterAll(() => {
-      jest.useRealTimers();
+      vitest.useRealTimers();
     });
 
     it('Reloads database once', () => {
@@ -315,10 +316,10 @@ describe('IP2Location DB reader', () => {
         cacheDatabaseInMemory: false,
       });
       expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
-      jest.advanceTimersByTime(200);
+      vitest.advanceTimersByTime(200);
       expect(watchCallbackCount).toBe(3);
-      jest.advanceTimersByTime(300);
-      jest.runOnlyPendingTimers();
+      vitest.advanceTimersByTime(300);
+      vitest.runOnlyPendingTimers();
       expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
       expect(watchSpy).toHaveBeenCalledTimes(2);
       expect(initSpy).toHaveBeenCalledTimes(1);
@@ -336,10 +337,10 @@ describe('IP2Location DB reader', () => {
         cacheDatabaseInMemory: true,
       });
       expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
-      jest.advanceTimersByTime(200);
+      vitest.advanceTimersByTime(200);
       expect(watchCallbackCount).toBe(3);
-      jest.advanceTimersByTime(300);
-      jest.runOnlyPendingTimers();
+      vitest.advanceTimersByTime(300);
+      vitest.runOnlyPendingTimers();
       expect(dbReader.readerStatus).toBe(ReaderStatus.Ready);
       expect(watchSpy).toHaveBeenCalledTimes(2);
       expect(initSpy).toHaveBeenCalledTimes(1);
