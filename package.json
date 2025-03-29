@@ -40,9 +40,6 @@
     "url": "https://github.com/mdmower/ip2ldb-reader/issues"
   },
   "homepage": "https://github.com/mdmower/ip2ldb-reader#readme",
-  "overrides": {
-    "esbuild": "0.25.0"
-  },
   "dependencies": {
     "csv-parser": "^3.2.0"
   },
