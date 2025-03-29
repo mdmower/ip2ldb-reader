@@ -47,20 +47,20 @@
     "csv-parser": "^3.2.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.21.0",
-    "@types/node": "^18.19.76",
+    "@eslint/js": "^9.23.0",
+    "@types/node": "^18.19.84",
     "@vitest/eslint-plugin": "^1.1.38",
-    "eslint": "^9.21.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-jsdoc": "^50.6.3",
-    "eslint-plugin-prettier": "^5.2.3",
-    "prettier": "^3.5.2",
-    "publint": "^0.3.6",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-jsdoc": "^50.6.9",
+    "eslint-plugin-prettier": "^5.2.5",
+    "prettier": "^3.5.3",
+    "publint": "^0.3.9",
     "rimraf": "^6.0.1",
-    "tsup": "^8.3.6",
+    "tsup": "^8.4.0",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.1",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.28.0",
     "vitest": "^3.0.9"
   }
 }
