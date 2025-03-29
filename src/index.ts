@@ -1,5 +1,5 @@
 import {DbReader} from './db-reader.js';
-import {Ip2lOptions, Ip2lData} from './interfaces.js';
+import type {Ip2lOptions, Ip2lData} from './interfaces.js';
 import {SubdivReader} from './subdiv-reader.js';
 import {GeoNameIdReader} from './geonameid-reader.js';
 import {CountryInfoReader} from './country-info-reader.js';

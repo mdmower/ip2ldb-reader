@@ -11,7 +11,8 @@
   "scripts": {
     "build": "npm run lint && npm run compile && publint",
     "clean": "rimraf lib",
-    "cli-test": "node lib/cli.js",
+    "cli": "node lib/cli.js",
+    "cli:debug": "tsx src/cli.ts",
     "compile": "tsup",
     "compile:debug": "tsup --env.dev true",
     "format": "prettier --write .",
@@ -57,6 +58,7 @@
     "publint": "^0.3.6",
     "rimraf": "^6.0.1",
     "tsup": "^8.3.6",
+    "tsx": "^4.19.3",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.1",
     "vitest": "^3.0.9"

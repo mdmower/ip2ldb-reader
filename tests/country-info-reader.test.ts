@@ -1,5 +1,5 @@
 import {CountryInfoReader} from '../src/country-info-reader.js';
-import {CountryInfoData} from '../src/interfaces.js';
+import type {CountryInfoData} from '../src/interfaces.js';
 
 // Requires "more information" country info CSV database from
 // https://www.ip2location.com/free/country-information

@@ -6,6 +6,7 @@
     "target": "ES2022",
     "strict": true,
     "esModuleInterop": true,
+    "importHelpers": true,
     "outDir": "lib"
   }
 }

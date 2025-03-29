@@ -1,5 +1,5 @@
 import {CsvReader, ReaderStatus} from './csv-reader.js';
-import {CountryInfoData} from './interfaces.js';
+import type {CountryInfoData} from './interfaces.js';
 
 type CountryInfoMap = Record<string, CountryInfoData | undefined>;
 

@@ -1,6 +1,6 @@
 import fs, {FSWatcher} from 'node:fs';
 import {parseIp} from './ip-utils.js';
-import {Ip2lData, Ip2lOptions} from './interfaces.js';
+import type {Ip2lData, Ip2lOptions} from './interfaces.js';
 
 // prettier-ignore
 const Position = {

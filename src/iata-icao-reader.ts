@@ -1,5 +1,5 @@
 import {CsvReader, ReaderStatus} from './csv-reader.js';
-import {IataIcaoData} from './interfaces.js';
+import type {IataIcaoData} from './interfaces.js';
 
 type IataIcaoMap = Record<string, Record<string, IataIcaoData[] | undefined> | undefined>;
 
