@@ -1,6 +1,6 @@
 {
   "name": "ip2ldb-reader",
-  "version": "3.0.3",
+  "version": "4.0.0",
   "description": "Reader for IP2Location databases",
   "type": "module",
   "main": "./lib/index.cjs",
@@ -21,7 +21,7 @@
     "test": "vitest"
   },
   "engines": {
-    "node": ">= 18.19.0"
+    "node": ">= 20.19.0"
   },
   "files": [
     "/lib"
@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
-    "@types/node": "^18.19.84",
+    "@types/node": "^20.19.11",
     "@vitest/eslint-plugin": "^1.1.38",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
