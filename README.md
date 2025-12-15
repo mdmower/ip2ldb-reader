@@ -91,7 +91,10 @@ interface Ip2lData {
   airports?: IataIcaoData[];
   areacode?: string;
   as?: string;
+  ascidr?: string;
+  asdomain?: string;
   asn?: string;
+  asusagetype?: string;
   category?: string;
   city?: string;
   country_info?: CountryInfoData | null;
