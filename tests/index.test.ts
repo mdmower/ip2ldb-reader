@@ -39,16 +39,16 @@ describe('Multiple DB readers', () => {
     });
 
     it('Identifies IPv4 address', () => {
-      const testIp = '8.8.8.8';
+      const testIp = '1.0.0.0';
       const ipNum = parseIp(testIp).ipNum.toString();
       const dbResult = dbReader.get(testIp);
 
       const expectedResultPartial = {
-        country_short: 'US',
+        country_short: 'AU',
         ip: testIp,
         ip_no: ipNum,
-        latitude: 37.386051,
-        longitude: -122.083847,
+        latitude: -27.467541,
+        longitude: 153.028091,
         status: 'OK',
       };
 
@@ -65,14 +65,14 @@ describe('Multiple DB readers', () => {
         country_info,
       } = dbResult;
       expect(country_short).toBe(expectedResultPartial.country_short);
-      expect(geoname_id).toBe(5375481);
+      expect(geoname_id).toBe(2174003);
       expect(ip).toBe(expectedResultPartial.ip);
       expect(ip_no).toBe(expectedResultPartial.ip_no);
       expect(latitude).toBeCloseTo(expectedResultPartial.latitude);
       expect(longitude).toBeCloseTo(expectedResultPartial.longitude);
       expect(status).toBe(expectedResultPartial.status);
-      expect(subdivision).toBe('CA');
-      expect(country_info?.idd_code).toBe(1);
+      expect(subdivision).toBe('QLD');
+      expect(country_info?.idd_code).toBe(61);
       expect(airports?.length).toBeGreaterThan(0);
     });
 
@@ -112,14 +112,14 @@ describe('Multiple DB readers', () => {
         'zipcode',
       ];
 
-      const testIp = '8.8.8.8';
+      const testIp = '1.0.0.0';
       const dbResult = dbReader.get(testIp);
       expect(Object.keys(dbResult).sort()).toEqual(allPossibleKeys);
     });
 
     it('Supports reinitialization', async () => {
       dbReader.close();
-      const testIp = '8.8.8.8';
+      const testIp = '1.0.0.0';
       expect(dbReader.get(testIp)).toEqual({
         ip: testIp,
         ip_no: '',
@@ -134,10 +134,10 @@ describe('Multiple DB readers', () => {
       const {status, country_short, geoname_id, subdivision, country_info, airports} =
         dbReader.get(testIp);
       expect(status).toBe('OK');
-      expect(country_short).toBe('US');
-      expect(geoname_id).toBe(5375481);
-      expect(subdivision).toBe('CA');
-      expect(country_info?.idd_code).toBe(1);
+      expect(country_short).toBe('AU');
+      expect(geoname_id).toBe(2174003);
+      expect(subdivision).toBe('QLD');
+      expect(country_info?.idd_code).toBe(61);
       expect(airports?.length).toBeGreaterThan(0);
     });
   });

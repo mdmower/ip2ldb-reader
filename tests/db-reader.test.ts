@@ -25,38 +25,39 @@ describe('IP2Location DB reader', () => {
     });
 
     it('Identifies IPv6 address', () => {
-      const testIp = '2001:4860:4860::8888';
-      const ipNum = parseIp(testIp).ipNum.toString();
-      const dbResult = dbReader.get(testIp);
-
-      const demoKeys = Object.keys(dbResult).filter((key) => {
-        return !['country_short', 'ip', 'ip_no', 'latitude', 'longitude', 'status'].includes(key);
-      });
-
-      for (const demoKey of demoKeys) {
-        expect(dbResult[demoKey]).toMatch(/^This is IP2Location DB26 IPv6 sample BIN database\./);
-      }
-
-      const {country_short, ip, ip_no, latitude, longitude, status} = dbResult;
-      expect(country_short).toBe('');
-      expect(ip).toBe(testIp);
-      expect(ip_no).toBe(ipNum);
-      expect(latitude).toBe(null);
-      expect(longitude).toBe(null);
-      expect(status).toBe('OK');
-    });
-
-    it('Identifies IPv4 address', () => {
-      const testIp = '8.8.8.8';
+      const testIp = '2a04::';
       const ipNum = parseIp(testIp).ipNum.toString();
       const dbResult = dbReader.get(testIp);
 
       const expectedResultPartial = {
-        country_short: 'US',
+        country_short: 'DE',
         ip: testIp,
         ip_no: ipNum,
-        latitude: 37.386051,
-        longitude: -122.083847,
+        latitude: 50.583328,
+        longitude: 8.01667,
+        status: 'OK',
+      };
+
+      const {country_short, ip, ip_no, latitude, longitude, status} = dbResult;
+      expect(country_short).toBe(expectedResultPartial.country_short);
+      expect(ip).toBe(expectedResultPartial.ip);
+      expect(ip_no).toBe(expectedResultPartial.ip_no);
+      expect(latitude).toBeCloseTo(expectedResultPartial.latitude);
+      expect(longitude).toBeCloseTo(expectedResultPartial.longitude);
+      expect(status).toBe(expectedResultPartial.status);
+    });
+
+    it('Identifies IPv4 address', () => {
+      const testIp = '1.0.0.0';
+      const ipNum = parseIp(testIp).ipNum.toString();
+      const dbResult = dbReader.get(testIp);
+
+      const expectedResultPartial = {
+        country_short: 'AU',
+        ip: testIp,
+        ip_no: ipNum,
+        latitude: -27.467541,
+        longitude: 153.028091,
         status: 'OK',
       };
 
