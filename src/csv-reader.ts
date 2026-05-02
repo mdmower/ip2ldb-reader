@@ -1,5 +1,5 @@
 import fs, {FSWatcher} from 'node:fs';
-import csvParser from 'csv-parser';
+import {parse} from 'csv-parse';
 
 enum ReaderStatus {
   NotInitialized = 0,
@@ -25,23 +25,19 @@ abstract class CsvReader {
    * @param csvPath Filesystem path to IP2Location CSV database
    */
   private async loadCsv(csvPath: string): Promise<void> {
-    const parser = fs.createReadStream(csvPath).pipe(csvParser());
-
-    let firstRecord = true;
+    const parser = fs.createReadStream(csvPath).pipe(
+      parse({
+        columns: (header) => {
+          if (!this.requiredCsvHeaders_.every((h) => header.includes(h))) {
+            throw new Error('CSV database does not have expected headings');
+          }
+          return header;
+        },
+      })
+    );
 
     for await (const record of parser) {
-      const inputData = record as Record<string, string>;
-
-      if (
-        firstRecord &&
-        Object.keys(inputData).filter((key) => this.requiredCsvHeaders_.includes(key)).length !==
-          this.requiredCsvHeaders_.length
-      ) {
-        throw new Error('CSV database does not have expected headings');
-      }
-      firstRecord = false;
-
-      this.processRecord(inputData);
+      this.processRecord(record as Record<string, string>);
     }
   }
 

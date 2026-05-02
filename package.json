@@ -41,7 +41,7 @@
   },
   "homepage": "https://github.com/mdmower/ip2ldb-reader#readme",
   "dependencies": {
-    "csv-parser": "^3.2.0"
+    "csv-parse": "^6.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
