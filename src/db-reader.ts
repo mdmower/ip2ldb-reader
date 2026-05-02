@@ -560,10 +560,7 @@ class DbReader {
       return data;
     }
 
-    let ipVersion: number;
-    let ipNum: bigint;
-    ({ip, ipVersion, ipNum} = parseIp(ip));
-
+    const {ipVersion, ipNum} = parseIp(ip);
     if (!ipVersion) {
       data.status = 'INVALID_IP_ADDRESS';
     } else if (ipVersion === 6 && this.dbStats_.OldBIN) {
