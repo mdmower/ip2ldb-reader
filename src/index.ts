@@ -5,6 +5,7 @@ import {GeoNameIdReader} from './geonameid-reader.js';
 import {CountryInfoReader} from './country-info-reader.js';
 import {IataIcaoReader} from './iata-icao-reader.js';
 import {ContinentReader} from './continent-reader.js';
+import {OlsonTzReader} from './olson-tz-reader.js';
 
 export default class Ip2lReader {
   private dbReader_: DbReader;
@@ -13,6 +14,7 @@ export default class Ip2lReader {
   private countryInfoReader_?: CountryInfoReader;
   private iataIcaoReader_?: IataIcaoReader;
   private continentReader_?: ContinentReader;
+  private olsonTzReader_?: OlsonTzReader;
 
   constructor() {
     this.dbReader_ = new DbReader();
@@ -58,6 +60,12 @@ export default class Ip2lReader {
     if (options.continentCsvPath) {
       this.continentReader_ = new ContinentReader();
       await this.continentReader_.init(options.continentCsvPath, options.reloadOnDbUpdate);
+    }
+
+    // Olson time zone support
+    if (options.olsonTzCsvPath) {
+      this.olsonTzReader_ = new OlsonTzReader();
+      await this.olsonTzReader_.init(options.olsonTzCsvPath, options.reloadOnDbUpdate);
     }
   }
 
@@ -120,6 +128,21 @@ export default class Ip2lReader {
       }
     }
 
+    // Olson time zone support is optional
+    if (this.olsonTzReader_) {
+      if (
+        typeof ip2lData.country_short === 'string' &&
+        typeof ip2lData.region === 'string' &&
+        typeof ip2lData.city === 'string'
+      ) {
+        ip2lData.olson_timezone = this.olsonTzReader_.get(
+          ip2lData.country_short,
+          ip2lData.region,
+          ip2lData.city
+        );
+      }
+    }
+
     return ip2lData;
   }
 
@@ -133,6 +156,7 @@ export default class Ip2lReader {
     this.countryInfoReader_?.close();
     this.iataIcaoReader_?.close();
     this.continentReader_?.close();
+    this.olsonTzReader_?.close();
   }
 }
 

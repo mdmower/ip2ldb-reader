@@ -7,7 +7,7 @@ describe('Multiple DB readers', () => {
   // to be decompressed, renamed to IP2LOCATION-SAMPLE-DB26.IPV6.BIN,
   // and made available in /database folder within project directory.
   const db26Path = 'database/IP2LOCATION-SAMPLE-DB26.IPV6.BIN';
-  // Requires CSV subdivision database from https://www.ip2location.com/free/geoname-id
+  // Requires CSV GeoName ID database from https://www.ip2location.com/free/geoname-id
   // to be decompressed and made available in /database folder within project directory.
   const geonameidDbPath = 'database/IP2LOCATION-GEONAMEID.CSV';
   // Requires CSV subdivision database from https://www.ip2location.com/free/iso3166-2
@@ -24,6 +24,9 @@ describe('Multiple DB readers', () => {
   // https://www.ip2location.com/free/continent-multilingual
   // to be decompressed and made available in /database folder within project directory.
   const continentDbPath = 'database/IP2LOCATION-CONTINENT-MULTILINGUAL.CSV';
+  // Requires CSV Olson Time Zone database from https://www.ip2location.com/free/olson-timezone
+  // to be decompressed and made available in /database folder within project directory.
+  const olsontzDbPath = 'database/IP2LOCATION-OLSON-TIMEZONE.CSV';
 
   describe('Identify using multiple readers', () => {
     let dbReader: Ip2lReader;
@@ -36,6 +39,7 @@ describe('Multiple DB readers', () => {
         countryInfoCsvPath: countryInfoDbPath,
         iataIcaoCsvPath: iataIcaoDbPath,
         continentCsvPath: continentDbPath,
+        olsonTzCsvPath: olsontzDbPath,
       });
     });
 
@@ -69,6 +73,7 @@ describe('Multiple DB readers', () => {
         subdivision,
         country_info,
         continent,
+        olson_timezone,
       } = dbResult;
       expect(country_short).toBe(expectedResultPartial.country_short);
       expect(geoname_id).toBe(2174003);
@@ -81,6 +86,7 @@ describe('Multiple DB readers', () => {
       expect(country_info?.idd_code).toBe(61);
       expect(airports?.length).toBeGreaterThan(0);
       expect(continent?.continent_code).toBe('OC');
+      expect(olson_timezone?.olson_tz).toBe('Australia/Brisbane');
     });
 
     it('Contains all possible keys', () => {
@@ -113,6 +119,7 @@ describe('Multiple DB readers', () => {
         'mnc',
         'mobilebrand',
         'netspeed',
+        'olson_timezone',
         'region',
         'status',
         'subdivision',
@@ -142,9 +149,18 @@ describe('Multiple DB readers', () => {
         countryInfoCsvPath: countryInfoDbPath,
         iataIcaoCsvPath: iataIcaoDbPath,
         continentCsvPath: continentDbPath,
+        olsonTzCsvPath: olsontzDbPath,
       });
-      const {status, country_short, geoname_id, subdivision, country_info, airports, continent} =
-        dbReader.get(testIp);
+      const {
+        status,
+        country_short,
+        geoname_id,
+        subdivision,
+        country_info,
+        airports,
+        continent,
+        olson_timezone,
+      } = dbReader.get(testIp);
       expect(status).toBe('OK');
       expect(country_short).toBe('AU');
       expect(geoname_id).toBe(2174003);
@@ -152,6 +168,7 @@ describe('Multiple DB readers', () => {
       expect(country_info?.idd_code).toBe(61);
       expect(airports?.length).toBeGreaterThan(0);
       expect(continent?.continent_code).toBe('OC');
+      expect(olson_timezone?.olson_tz).toBe('Australia/Brisbane');
     });
   });
 });

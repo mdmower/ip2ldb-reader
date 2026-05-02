@@ -33,6 +33,11 @@ export interface Ip2lOptions {
    * Path to IP2Location Continent Multilingual CSV database (default: undefined)
    */
   continentCsvPath?: string;
+
+  /**
+   * Path to IP2Location Olson Time Zone CSV database (default: undefined)
+   */
+  olsonTzCsvPath?: string;
 }
 
 export interface CountryInfoData {
@@ -126,6 +131,28 @@ export interface ContinentData {
   continent: string;
 }
 
+export interface OlsonTzData {
+  /**
+   * Olson time zone
+   */
+  olson_tz: string;
+
+  /**
+   * Time zone abbreviation
+   */
+  abbreviation: string;
+
+  /**
+   * The UTC ISO-8601 date when Daylight Saving Time begins
+   */
+  dst_start: string | null;
+
+  /**
+   * The UTC ISO-8601 date when Daylight Saving Time ends
+   */
+  dst_end: string | null;
+}
+
 export interface IataIcaoData {
   [key: string]: string | number | null | undefined;
 
@@ -162,6 +189,7 @@ export interface Ip2lData {
     | CountryInfoData
     | ContinentData
     | IataIcaoData[]
+    | OlsonTzData
     | null
     | undefined;
 
@@ -309,6 +337,11 @@ export interface Ip2lData {
    * GeoName ID
    */
   geoname_id?: number | null;
+
+  /**
+   * Olson time zone
+   */
+  olson_timezone?: OlsonTzData | null;
 
   /**
    * IATA/ICAO airport info

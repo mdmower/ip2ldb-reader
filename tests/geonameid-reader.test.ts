@@ -1,6 +1,6 @@
 import {GeoNameIdReader} from '../src/geonameid-reader.js';
 
-// Requires CSV subdivision database from https://www.ip2location.com/free/geoname-id
+// Requires CSV GeoName ID database from https://www.ip2location.com/free/geoname-id
 // to be decompressed and made available in /database folder within project directory.
 const geonameidDbPath = 'database/IP2LOCATION-GEONAMEID.CSV';
 
