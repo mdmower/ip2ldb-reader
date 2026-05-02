@@ -126,7 +126,7 @@ interface Ip2lData {
   mnc?: string;
   mobilebrand?: string;
   netspeed?: string;
-  olson_timezone?: OlsonTimeZoneData | null;
+  olson_timezone?: OlsonTzData | null;
   region?: string;
   subdivision?: string | null;
   timezone?: string;
@@ -175,19 +175,19 @@ and
 
 ```ts
 interface ContinentData {
-  continent: string;
   continent_code: string;
+  continent: string;
 }
 ```
 
 and
 
 ```ts
-interface OlsonTimeZoneData {
-  olson_tz: string;
+interface OlsonTzData {
   abbreviation: string;
-  dst_start: string;
-  dst_end: string;
+  dst_end: string | null;
+  dst_start: string | null;
+  olson_tz: string;
 }
 ```
 
