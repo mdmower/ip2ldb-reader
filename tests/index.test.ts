@@ -20,6 +20,10 @@ describe('Multiple DB readers', () => {
   // Requires CSV IATA/ICAO database from https://github.com/ip2location/ip2location-iata-icao
   // to be made available in /database folder within project directory.
   const iataIcaoDbPath = 'database/IP2LOCATION-IATA-ICAO.CSV';
+  // Requires Continent Multilingual CSV database from
+  // https://www.ip2location.com/free/continent-multilingual
+  // to be decompressed and made available in /database folder within project directory.
+  const continentDbPath = 'database/IP2LOCATION-CONTINENT-MULTILINGUAL.CSV';
 
   describe('Identify using multiple readers', () => {
     let dbReader: Ip2lReader;
@@ -31,6 +35,7 @@ describe('Multiple DB readers', () => {
         subdivisionCsvPath: subdivDbPath,
         countryInfoCsvPath: countryInfoDbPath,
         iataIcaoCsvPath: iataIcaoDbPath,
+        continentCsvPath: continentDbPath,
       });
     });
 
@@ -63,6 +68,7 @@ describe('Multiple DB readers', () => {
         status,
         subdivision,
         country_info,
+        continent,
       } = dbResult;
       expect(country_short).toBe(expectedResultPartial.country_short);
       expect(geoname_id).toBe(2174003);
@@ -74,6 +80,7 @@ describe('Multiple DB readers', () => {
       expect(subdivision).toBe('QLD');
       expect(country_info?.idd_code).toBe(61);
       expect(airports?.length).toBeGreaterThan(0);
+      expect(continent?.continent_code).toBe('OC');
     });
 
     it('Contains all possible keys', () => {
@@ -88,6 +95,7 @@ describe('Multiple DB readers', () => {
         'asusagetype',
         'category',
         'city',
+        'continent',
         'country_info',
         'country_long',
         'country_short',
@@ -133,8 +141,9 @@ describe('Multiple DB readers', () => {
         subdivisionCsvPath: subdivDbPath,
         countryInfoCsvPath: countryInfoDbPath,
         iataIcaoCsvPath: iataIcaoDbPath,
+        continentCsvPath: continentDbPath,
       });
-      const {status, country_short, geoname_id, subdivision, country_info, airports} =
+      const {status, country_short, geoname_id, subdivision, country_info, airports, continent} =
         dbReader.get(testIp);
       expect(status).toBe('OK');
       expect(country_short).toBe('AU');
@@ -142,6 +151,7 @@ describe('Multiple DB readers', () => {
       expect(subdivision).toBe('QLD');
       expect(country_info?.idd_code).toBe(61);
       expect(airports?.length).toBeGreaterThan(0);
+      expect(continent?.continent_code).toBe('OC');
     });
   });
 });

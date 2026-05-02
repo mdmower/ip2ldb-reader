@@ -63,6 +63,9 @@ ip2lReader.close();
 
   // {string} Path to IATA/ICAO airport CSV database
   iataIcaoCsvPath: undefined,
+
+  // {string} Path to continent multilingual CSV database
+  continentCsvPath: undefined,
 }
 ```
 
@@ -76,6 +79,7 @@ ip2lReader.close();
 - `geoNameIdCsvPath` - When a filesystem path to the [IP2Location GeoName ID CSV database](https://www.ip2location.com/free/geoname-id) is provided, the country code, region, and city will be used to identify the corresponding GeoName ID.
 - `countryInfoCsvPath` - When a filesystem path to the [IP2Location Country Information CSV database](https://www.ip2location.com/free/country-information) is provided, the country code will be used to identify additional country information (capital, population, currency, language, etc.).
 - `iataIcaoCsvPath` - When a filesystem path to the [IP2Location IATA/ICAO airport CSV database](https://github.com/ip2location/ip2location-iata-icao) is provided, the country code and region will be used to identify airports in the region.
+- `continentCsvPath` - When a filesystem path to the [IP2Location Continent Multilingual CSV database](https://www.ip2location.com/free/continent-multilingual) is provided, the country code will be used to identify the corresponding continent (English language only).
 
 ## Return
 
@@ -97,6 +101,7 @@ interface Ip2lData {
   asusagetype?: string;
   category?: string;
   city?: string;
+  continent?: ContinentData | null;
   country_info?: CountryInfoData | null;
   country_long?: string;
   country_short?: string;
@@ -156,6 +161,15 @@ interface IataIcaoData {
 }
 ```
 
+and
+
+```ts
+interface ContinentData {
+  continent: string;
+  continent_code: string;
+}
+```
+
 Properties suffixed by `?` only exist if the database supports them. For example, when using a DB1 (country only) database, a sample return object looks like
 
 ```
@@ -197,6 +211,7 @@ Unit tests require the following database files to be made available in folder `
 - [IP2LOCATION-GEONAMEID.CSV](https://www.ip2location.com/free/geoname-id) - GeoName ID database in CSV format
 - [IP2LOCATION-COUNTRY-INFORMATION.CSV](https://www.ip2location.com/free/country-information) - Country Info ("More Information" version) database in CSV format
 - [IP2LOCATION-IATA-ICAO.CSV](https://github.com/ip2location/ip2location-iata-icao) - IATA/ICAO airport database in CSV format
+- [IP2LOCATION-CONTINENT-MULTILINGUAL.CSV](https://www.ip2location.com/free/continent-multilingual) - Continent Multilingual database in CSV format
 - [IP2LOCATION-LITE-DB1.BIN](https://lite.ip2location.com/database/db1-ip-country) - LITE IP-COUNTRY DB1 IPv4 database in BIN format
 - [IP2LOCATION-SAMPLE-DB26.IPV6.BIN](https://www.ip2location.com/database/db26-ip-country-region-city-latitude-longitude-zipcode-timezone-isp-domain-netspeed-areacode-weather-mobile-elevation-usagetype-addresstype-category-district-asn) - Sample DB26 IPv6 database in BIN format
 

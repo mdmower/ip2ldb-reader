@@ -4,6 +4,7 @@ import {SubdivReader} from './subdiv-reader.js';
 import {GeoNameIdReader} from './geonameid-reader.js';
 import {CountryInfoReader} from './country-info-reader.js';
 import {IataIcaoReader} from './iata-icao-reader.js';
+import {ContinentReader} from './continent-reader.js';
 
 export default class Ip2lReader {
   private dbReader_: DbReader;
@@ -11,6 +12,7 @@ export default class Ip2lReader {
   private geoNameIdReader_?: GeoNameIdReader;
   private countryInfoReader_?: CountryInfoReader;
   private iataIcaoReader_?: IataIcaoReader;
+  private continentReader_?: ContinentReader;
 
   constructor() {
     this.dbReader_ = new DbReader();
@@ -46,9 +48,16 @@ export default class Ip2lReader {
       await this.countryInfoReader_.init(options.countryInfoCsvPath, options.reloadOnDbUpdate);
     }
 
+    // IATA/ICAO airport support
     if (options.iataIcaoCsvPath) {
       this.iataIcaoReader_ = new IataIcaoReader();
       await this.iataIcaoReader_.init(options.iataIcaoCsvPath, options.reloadOnDbUpdate);
+    }
+
+    // Continent support
+    if (options.continentCsvPath) {
+      this.continentReader_ = new ContinentReader();
+      await this.continentReader_.init(options.continentCsvPath, options.reloadOnDbUpdate);
     }
   }
 
@@ -95,11 +104,19 @@ export default class Ip2lReader {
       }
     }
 
-    // IATA/ICAO airport info support is optional
+    // IATA/ICAO airport support is optional
     if (this.iataIcaoReader_) {
       if (typeof ip2lData.country_short === 'string' && typeof ip2lData.region === 'string') {
         const airports = this.iataIcaoReader_.get(ip2lData.country_short, ip2lData.region);
         ip2lData.airports = airports;
+      }
+    }
+
+    // Continent support is optional
+    if (this.continentReader_) {
+      if (typeof ip2lData.country_short === 'string') {
+        const continent = this.continentReader_.get(ip2lData.country_short);
+        ip2lData.continent = continent;
       }
     }
 
@@ -115,6 +132,7 @@ export default class Ip2lReader {
     this.geoNameIdReader_?.close();
     this.countryInfoReader_?.close();
     this.iataIcaoReader_?.close();
+    this.continentReader_?.close();
   }
 }
 

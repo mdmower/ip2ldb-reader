@@ -28,6 +28,11 @@ export interface Ip2lOptions {
    * Path to IATA/ICAO airport CSV database (default: undefined)
    */
   iataIcaoCsvPath?: string;
+
+  /**
+   * Path to IP2Location Continent Multilingual CSV database (default: undefined)
+   */
+  continentCsvPath?: string;
 }
 
 export interface CountryInfoData {
@@ -109,6 +114,18 @@ export interface CountryInfoData {
   cctld?: string;
 }
 
+export interface ContinentData {
+  /**
+   * Two-character continent code (AF, AN, AS, EU, NA, OC, SA)
+   */
+  continent_code: string;
+
+  /**
+   * Continent name
+   */
+  continent: string;
+}
+
 export interface IataIcaoData {
   [key: string]: string | number | null | undefined;
 
@@ -139,7 +156,14 @@ export interface IataIcaoData {
 }
 
 export interface Ip2lData {
-  [key: string]: string | number | CountryInfoData | IataIcaoData[] | null | undefined;
+  [key: string]:
+    | string
+    | number
+    | CountryInfoData
+    | ContinentData
+    | IataIcaoData[]
+    | null
+    | undefined;
 
   /**
    * IP address
@@ -170,6 +194,11 @@ export interface Ip2lData {
    * Country info
    */
   country_info?: CountryInfoData | null;
+
+  /**
+   * Continent
+   */
+  continent?: ContinentData | null;
 
   /**
    * Subdivision part of ISO 3166-2 country-subdivision code
