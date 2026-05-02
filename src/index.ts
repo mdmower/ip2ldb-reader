@@ -77,70 +77,59 @@ export default class Ip2lReader {
     const ip2lData = this.dbReader_.get(ip);
 
     // Subdivision support is optional
-    if (this.subdivReader_) {
-      if (typeof ip2lData.country_short === 'string' && typeof ip2lData.region === 'string') {
-        const subdivision = this.subdivReader_.get(ip2lData.country_short, ip2lData.region);
-        if (subdivision !== null) {
-          ip2lData.subdivision = subdivision;
-        }
-      }
+    if (
+      this.subdivReader_ &&
+      typeof ip2lData.country_short === 'string' &&
+      typeof ip2lData.region === 'string'
+    ) {
+      ip2lData.subdivision = this.subdivReader_.get(ip2lData.country_short, ip2lData.region);
     }
 
     // GeoName ID support is optional
-    if (this.geoNameIdReader_) {
-      if (
-        typeof ip2lData.country_short === 'string' &&
-        typeof ip2lData.region === 'string' &&
-        typeof ip2lData.city === 'string'
-      ) {
-        const geoNameId = this.geoNameIdReader_.get(
-          ip2lData.country_short,
-          ip2lData.region,
-          ip2lData.city
-        );
-        if (geoNameId !== null) {
-          ip2lData.geoname_id = geoNameId;
-        }
-      }
+    if (
+      this.geoNameIdReader_ &&
+      typeof ip2lData.country_short === 'string' &&
+      typeof ip2lData.region === 'string' &&
+      typeof ip2lData.city === 'string'
+    ) {
+      ip2lData.geoname_id = this.geoNameIdReader_.get(
+        ip2lData.country_short,
+        ip2lData.region,
+        ip2lData.city
+      );
     }
 
     // Country info support is optional
-    if (this.countryInfoReader_) {
-      if (typeof ip2lData.country_short === 'string') {
-        const countryInfo = this.countryInfoReader_.get(ip2lData.country_short);
-        ip2lData.country_info = countryInfo;
-      }
+    if (this.countryInfoReader_ && typeof ip2lData.country_short === 'string') {
+      ip2lData.country_info = this.countryInfoReader_.get(ip2lData.country_short);
     }
 
     // IATA/ICAO airport support is optional
-    if (this.iataIcaoReader_) {
-      if (typeof ip2lData.country_short === 'string' && typeof ip2lData.region === 'string') {
-        const airports = this.iataIcaoReader_.get(ip2lData.country_short, ip2lData.region);
-        ip2lData.airports = airports;
-      }
+    if (
+      this.iataIcaoReader_ &&
+      typeof ip2lData.country_short === 'string' &&
+      typeof ip2lData.region === 'string'
+    ) {
+      ip2lData.airports = this.iataIcaoReader_.get(ip2lData.country_short, ip2lData.region);
     }
 
     // Continent support is optional
-    if (this.continentReader_) {
-      if (typeof ip2lData.country_short === 'string') {
-        const continent = this.continentReader_.get(ip2lData.country_short);
-        ip2lData.continent = continent;
-      }
+    if (this.continentReader_ && typeof ip2lData.country_short === 'string') {
+      ip2lData.continent = this.continentReader_.get(ip2lData.country_short);
     }
 
     // Olson time zone support is optional
-    if (this.olsonTzReader_) {
-      if (
-        typeof ip2lData.country_short === 'string' &&
-        typeof ip2lData.region === 'string' &&
-        typeof ip2lData.city === 'string'
-      ) {
-        ip2lData.olson_timezone = this.olsonTzReader_.get(
-          ip2lData.country_short,
-          ip2lData.region,
-          ip2lData.city
-        );
-      }
+    if (
+      this.olsonTzReader_ &&
+      typeof ip2lData.country_short === 'string' &&
+      typeof ip2lData.region === 'string' &&
+      typeof ip2lData.city === 'string'
+    ) {
+      ip2lData.olson_timezone = this.olsonTzReader_.get(
+        ip2lData.country_short,
+        ip2lData.region,
+        ip2lData.city
+      );
     }
 
     return ip2lData;

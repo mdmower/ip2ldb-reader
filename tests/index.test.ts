@@ -130,7 +130,8 @@ describe('Multiple DB readers', () => {
         'zipcode',
       ];
 
-      const testIp = '1.0.0.0';
+      // Intentionally using an IP with no associated data to ensure that null values are set
+      const testIp = '0.0.0.0';
       const dbResult = dbReader.get(testIp);
       expect(Object.keys(dbResult).sort()).toEqual(allPossibleKeys);
     });

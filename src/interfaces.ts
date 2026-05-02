@@ -231,7 +231,7 @@ export interface Ip2lData {
   /**
    * Subdivision part of ISO 3166-2 country-subdivision code
    */
-  subdivision?: string;
+  subdivision?: string | null;
 
   /**
    * Region or state name
