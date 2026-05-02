@@ -48,6 +48,14 @@ abstract class CsvReader {
   protected abstract processRecord(record: Record<string, string>): void;
 
   /**
+   * Clear cached records
+   *
+   * Called before (re)loading a CSV so that stale entries from the prior load are dropped instead
+   * of merged with new data.
+   */
+  protected abstract resetData(): void;
+
+  /**
    * Get reader status
    */
   public get readerStatus(): ReaderStatus {
@@ -72,6 +80,7 @@ abstract class CsvReader {
     }
 
     this.fsWatcher_ = null;
+    this.resetData();
   }
 
   /**
@@ -85,6 +94,7 @@ abstract class CsvReader {
     }
 
     this.readerStatus_ = ReaderStatus.Initializing;
+    this.resetData();
 
     await this.loadCsv(dbPath);
 

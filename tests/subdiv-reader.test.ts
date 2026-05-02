@@ -29,4 +29,18 @@ describe('Subdivision', () => {
       expect(subdivReader.get('XX', 'Abcdef')).toBe(null);
     });
   });
+
+  describe('Reload', () => {
+    it('Returns the same subdivision when init is called again', async () => {
+      const reader = new SubdivReader();
+      await reader.init(subdivDbPath);
+      const subdiv = reader.get('US', 'California');
+      expect(subdiv).toBe('CA');
+
+      await reader.init(subdivDbPath);
+      expect(reader.get('US', 'California')).toBe(subdiv);
+
+      reader.close();
+    });
+  });
 });

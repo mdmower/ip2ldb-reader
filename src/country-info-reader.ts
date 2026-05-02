@@ -49,10 +49,9 @@ class CountryInfoReader extends CsvReader {
   }
 
   /**
-   * Close database and uninitialize reader
+   * Reset stored data
    */
-  public close(): void {
-    super.close();
+  protected resetData(): void {
     this.countryInfoMap_ = {};
   }
 

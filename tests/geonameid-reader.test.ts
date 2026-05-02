@@ -25,4 +25,18 @@ describe('GeoName ID', () => {
       expect(geoNameIdReader.get('XX', 'Abcdef', 'Ghijkl')).toBe(null);
     });
   });
+
+  describe('Reload', () => {
+    it('Returns the same GeoName ID when init is called again', async () => {
+      const reader = new GeoNameIdReader();
+      await reader.init(geonameidDbPath);
+      const id = reader.get('US', 'California', 'Los Angeles');
+      expect(id).toBe(5368361);
+
+      await reader.init(geonameidDbPath);
+      expect(reader.get('US', 'California', 'Los Angeles')).toBe(id);
+
+      reader.close();
+    });
+  });
 });

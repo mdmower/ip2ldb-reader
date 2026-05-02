@@ -54,4 +54,18 @@ describe('IATA/ICAO airport info', () => {
       expect(iataIcaoReader.get('XX', 'Abcdef')).toEqual([]);
     });
   });
+
+  describe('Reload', () => {
+    it('Does not duplicate airports when init is called again', async () => {
+      const reader = new IataIcaoReader();
+      await reader.init(iataIcaoDbPath);
+      const numAirports = reader.get('US', 'California').length;
+      expect(numAirports).toBeGreaterThan(0);
+
+      await reader.init(iataIcaoDbPath);
+      expect(reader.get('US', 'California')).toHaveLength(numAirports);
+
+      reader.close();
+    });
+  });
 });

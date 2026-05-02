@@ -27,10 +27,9 @@ class SampleCsvReader extends CsvReader {
   }
 
   /**
-   * Close database and uninitialize reader
+   * Reset stored data
    */
-  public close(): void {
-    super.close();
+  protected resetData(): void {
     this.sampleCsvMap_ = {};
   }
 

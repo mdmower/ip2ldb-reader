@@ -53,4 +53,18 @@ describe('Country info', () => {
       expect(countryInfoReader.get('XX')).toBe(null);
     });
   });
+
+  describe('Reload', () => {
+    it('Returns the same country info when init is called again', async () => {
+      const reader = new CountryInfoReader();
+      await reader.init(countryInfoDbPath);
+      const record = reader.get('US');
+      expect(record).not.toBe(null);
+
+      await reader.init(countryInfoDbPath);
+      expect(reader.get('US')).toEqual(record);
+
+      reader.close();
+    });
+  });
 });
