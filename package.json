@@ -1,6 +1,6 @@
 {
   "name": "ip2ldb-reader",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "Reader for IP2Location databases",
   "type": "module",
   "main": "./lib/index.cjs",
@@ -9,12 +9,13 @@
     "import": "./lib/index.mjs"
   },
   "scripts": {
-    "build": "npm run lint && npm run compile && publint",
+    "build": "npm run check-types && npm run lint && npm run compile && publint",
     "clean": "rimraf lib",
     "cli": "node lib/cli.mjs",
     "cli:debug": "tsx src/cli.ts",
     "compile": "tsdown",
     "compile:debug": "tsdown --env.dev true",
+    "check-types": "tsc --noEmit && tsc --noEmit -p tests",
     "format": "prettier --write .",
     "lint": "eslint .",
     "prepare": "npm run compile",
@@ -52,6 +53,7 @@
     "eslint-plugin-jsdoc": "^62.9.0",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.6.0",
+    "jiti": "^2.6.1",
     "prettier": "^3.8.3",
     "publint": "^0.3.18",
     "rimraf": "^6.1.3",
