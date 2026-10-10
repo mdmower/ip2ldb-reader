@@ -116,6 +116,8 @@ const loopTest = (ip2Location: Ip2lReader) => {
   let geoNameIdFilename: string | undefined;
   let countryInfoFilename: string | undefined;
   let iataIcaoFilename: string | undefined;
+  let continentFilename: string | undefined;
+  let olsonTzFilename: string | undefined;
   if (csvSelection.length) {
     console.log('\nAvailable CSV databases:\n' + csvSelection.join('\n') + '\n');
     const selectedSubdivision = await new Promise<string>((resolve) => {
@@ -157,11 +159,38 @@ const loopTest = (ip2Location: Ip2lReader) => {
     } else if (selectedIataIcao) {
       console.log('Invalid IATA/ICAO airports selection');
     }
+
+    const selectedContinent = await new Promise<string>((resolve) => {
+      rl.question('Select a continent database by number (optional): ', resolve);
+    });
+
+    if (/^\d+$/.test(selectedContinent)) {
+      continentFilename = csvFiles[parseInt(selectedContinent) - 1]?.name;
+    } else if (selectedContinent) {
+      console.log('Invalid continent selection');
+    }
+
+    const selectedOlsonTz = await new Promise<string>((resolve) => {
+      rl.question('Select an Olson time zone database by number (optional): ', resolve);
+    });
+
+    if (/^\d+$/.test(selectedOlsonTz)) {
+      olsonTzFilename = csvFiles[parseInt(selectedOlsonTz) - 1]?.name;
+    } else if (selectedOlsonTz) {
+      console.log('Invalid Olson time zone selection');
+    }
   }
 
   console.log('\nLoading database(s):');
   console.log(`  ${databaseFilename}`);
-  [subdivisionFilename, geoNameIdFilename, countryInfoFilename, iataIcaoFilename]
+  [
+    subdivisionFilename,
+    geoNameIdFilename,
+    countryInfoFilename,
+    iataIcaoFilename,
+    continentFilename,
+    olsonTzFilename,
+  ]
     .filter(Boolean)
     .forEach((filename) => {
       console.log(`  ${filename ?? ''}`);
@@ -178,6 +207,8 @@ const loopTest = (ip2Location: Ip2lReader) => {
       geoNameIdCsvPath: geoNameIdFilename ? './database/' + geoNameIdFilename : undefined,
       countryInfoCsvPath: countryInfoFilename ? './database/' + countryInfoFilename : undefined,
       iataIcaoCsvPath: iataIcaoFilename ? './database/' + iataIcaoFilename : undefined,
+      continentCsvPath: continentFilename ? './database/' + continentFilename : undefined,
+      olsonTzCsvPath: olsonTzFilename ? './database/' + olsonTzFilename : undefined,
     });
     // ip2Location.close();
     // await ip2Location.init('./database/' + databaseFilename, {
