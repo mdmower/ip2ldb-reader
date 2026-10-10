@@ -7,7 +7,7 @@ A database reader for IP2Location [paid](https://www.ip2location.com/database), 
 
 ## Requirements
 
-- Minimum supported Node.js version: 20.19.0
+- Minimum supported Node.js version: 22.12.0
 
 ## Installation
 
