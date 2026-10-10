@@ -18,13 +18,22 @@ describe('Sample CSV info', () => {
       sampleCsvReader.close();
     });
 
-    it('Identifies first row', () => {
+    it('Identifies row with quoted value', () => {
       const expectedResult = {
         column_2: 'Some, "Column 2" Value',
         column_3: 0.5,
       };
 
       expect(sampleCsvReader.get('Row 1')).toEqual(expectedResult);
+    });
+
+    it('Identifies row with split value', () => {
+      const expectedResult = {
+        column_2: 'Split\nValue',
+        column_3: 0,
+      };
+
+      expect(sampleCsvReader.get('Row 2')).toEqual(expectedResult);
     });
 
     it('Does not identify non-existent row', () => {

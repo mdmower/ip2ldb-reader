@@ -1,2 +1,5 @@
 "column_1","column_2","column_3"
 "Row 1","Some, ""Column 2"" Value","0.5"
+
+"Row 2","Split
+Value","0"

@@ -33,6 +33,7 @@ abstract class CsvReader {
           }
           return header;
         },
+        skip_empty_lines: true,
       })
     );
 
