@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["src/cli.ts", "src/sample-csv-reader.ts"]
+}

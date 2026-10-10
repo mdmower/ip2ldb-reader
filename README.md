@@ -17,7 +17,7 @@ npm install --save ip2ldb-reader
 
 ## Usage
 
-Both ES Module and CommonJS exports are available. Importing this module should work seamlessly in either system.
+This package is published as an ES Module. CommonJS projects can `require()` the module (supported by Node.js v22.12.0 and newer).
 
 ```js
 // Import as ES Module

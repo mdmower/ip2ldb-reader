@@ -6,7 +6,7 @@
     "target": "ES2022",
     "strict": true,
     "esModuleInterop": true,
-    "importHelpers": true,
+    "declaration": true,
     "outDir": "lib",
     "rootDir": "src"
   },
