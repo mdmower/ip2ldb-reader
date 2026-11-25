@@ -4,7 +4,6 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import jsdoc from 'eslint-plugin-jsdoc';
 import vitest from '@vitest/eslint-plugin';
-import prettierConfigRecommended from 'eslint-plugin-prettier/recommended';
 
 export default defineConfig(
   {
@@ -76,6 +75,5 @@ export default defineConfig(
   {
     files: ['tests/**/*.ts'],
     ...vitest.configs.recommended,
-  },
-  prettierConfigRecommended
+  }
 );

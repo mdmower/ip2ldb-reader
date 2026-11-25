@@ -2,7 +2,7 @@ import fs, {FSWatcher} from 'node:fs';
 import {parseIp} from './ip-utils.js';
 import type {Ip2lData, Ip2lOptions} from './interfaces.js';
 
-// prettier-ignore
+// oxfmt-ignore
 const Position = {
   country: [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
   region: [0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
