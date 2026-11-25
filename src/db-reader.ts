@@ -290,8 +290,8 @@ class DbReader {
       this.enabled_[key] = Boolean(Position[key][dbType]);
     }
 
-    this.indiciesIPv4_ = new Array<number[]>(MAX_SIZE);
-    this.indiciesIPv6_ = new Array<number[]>(MAX_SIZE);
+    this.indiciesIPv4_ = [];
+    this.indiciesIPv6_ = [];
 
     if (this.dbStats_.Indexed) {
       let pointer = this.dbStats_.IndexBaseAddr;

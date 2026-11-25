@@ -209,7 +209,7 @@ describe('IP2Location DB reader', () => {
 
     it('Throws if DB not found and survives re-init', () => {
       dbReader.close();
-      expect(() => dbReader.init('none.bin')).toThrow();
+      expect(() => dbReader.init('none.bin')).toThrow('ENOENT');
       dbReader.init(db1Path);
       const testIp = '8.8.8.8';
       const {status, country_short} = dbReader.get(testIp);
@@ -258,7 +258,7 @@ describe('IP2Location DB reader', () => {
 
     it('Throws if DB not found and survives re-init', () => {
       dbReader.close();
-      expect(() => dbReader.init('none.bin')).toThrow();
+      expect(() => dbReader.init('none.bin')).toThrow('ENOENT');
       dbReader.init(db1Path, {
         cacheDatabaseInMemory: true,
       });
@@ -300,7 +300,7 @@ describe('IP2Location DB reader', () => {
       dbReader = new DbReader();
 
       initSpy = vitest.spyOn(dbReader, 'init');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // oxlint-disable-next-line typescript/no-explicit-any
       loadDatabaseSpy = vitest.spyOn(DbReader.prototype as any, 'loadDatabase');
     });
 
